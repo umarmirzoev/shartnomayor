@@ -17,9 +17,9 @@ export function AppMockup() {
           <span className="h-2.5 w-2.5 rounded-full bg-emerald-300" />
           <span className="ml-3 rounded-md bg-white px-3 py-1 text-[11px] text-ink-400 border border-ink-100">app.shartnomayor.tj/dashboard</span>
         </div>
-        <div className="grid grid-cols-[15px_1fr]">
-          <div />
-          <div className="grid grid-cols-[190px_1fr]">
+        <div className="grid grid-cols-1 sm:grid-cols-[15px_1fr]">
+          <div className="hidden sm:block" />
+          <div className="grid grid-cols-1 sm:grid-cols-[190px_1fr]">
             <div className="hidden border-r border-ink-100 bg-ink-50/60 p-4 sm:block">
               <div className="mb-4 flex items-center gap-2 px-1">
                 <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-ink-900 text-gold-500"><FileText size={12} /></span>
@@ -40,12 +40,12 @@ export function AppMockup() {
               </div>
             </div>
             <div className="p-4 sm:p-5">
-              <div className="mb-4 flex items-center justify-between">
-                <div>
-                  <p className="text-[13px] font-bold text-ink-900">{t.app.dashboard.welcome}, Фарход</p>
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="truncate text-[13px] font-bold text-ink-900">{t.app.dashboard.welcome}, Фарход</p>
                   <p className="text-[11px] text-ink-400">7 / 20 · {t.app.dashboard.aiLimit}</p>
                 </div>
-                <span className="flex items-center gap-1 rounded-full bg-gold-100 px-2.5 py-1 text-[10px] font-bold text-gold-700"><Sparkles size={10} /> {langLabels[lang]}</span>
+                <span className="flex shrink-0 items-center gap-1 rounded-full bg-gold-100 px-2.5 py-1 text-[10px] font-bold text-gold-700"><Sparkles size={10} /> {langLabels[lang]}</span>
               </div>
               <div className="mb-3 grid grid-cols-3 gap-2.5">
                 {[
