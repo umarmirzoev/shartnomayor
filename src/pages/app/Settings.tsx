@@ -4,74 +4,80 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Field, Input } from '@/components/ui/Input'
 import { useAppData, useAuth } from '@/lib/store'
+import { useT } from '@/lib/i18n/context'
+import { localizedLawyerFirm, localizeAuditEntry } from '@/lib/seedText'
 
 export default function Settings() {
+  const t = useT()
   const { user } = useAuth()
-  const { lawyer, aiUsed, aiLimit, audit, resetDemoData } = useAppData()
+  const { aiUsed, aiLimit, audit, resetDemoData } = useAppData()
   const usagePct = Math.round((aiUsed / aiLimit) * 100)
 
   return (
     <div className="max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-ink-950">Настройки</h1>
-        <p className="mt-1 text-sm text-ink-500">Профиль, тариф и журнал аудита действий в системе.</p>
+        <h1 className="text-2xl font-bold text-ink-950">{t.app.settings.title}</h1>
+        <p className="mt-1 text-sm text-ink-500">{t.app.settings.subtitle}</p>
       </div>
 
       <Card className="p-6">
-        <h2 className="mb-4 text-sm font-bold text-ink-900">Профиль</h2>
+        <h2 className="mb-4 text-sm font-bold text-ink-900">{t.app.settings.profile}</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Field label="Полное имя"><Input defaultValue={user?.name} /></Field>
-          <Field label="Email"><Input defaultValue={user?.email} /></Field>
-          <Field label="Юридическое бюро"><Input defaultValue={lawyer.firm} /></Field>
-          <Field label="Роль"><Input defaultValue="Юрист (единый интерфейс, без ролей на MVP)" disabled /></Field>
+          <Field label={t.app.settings.fullName}><Input defaultValue={user?.name} /></Field>
+          <Field label={t.app.settings.email}><Input defaultValue={user?.email} /></Field>
+          <Field label={t.app.settings.firm}><Input defaultValue={localizedLawyerFirm(t)} /></Field>
+          <Field label={t.app.settings.role}><Input defaultValue={t.app.settings.roleValue} disabled /></Field>
         </div>
-        <Button size="sm" className="mt-5">Сохранить изменения</Button>
+        <Button size="sm" className="mt-5">{t.app.settings.saveChanges}</Button>
       </Card>
 
       <Card className="p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="flex items-center gap-2 text-sm font-bold text-ink-900"><Sparkles size={15} className="text-gold-600" /> Тариф и лимит ИИ</h2>
-          <Badge tone="gold">Бесплатный</Badge>
+          <h2 className="flex items-center gap-2 text-sm font-bold text-ink-900"><Sparkles size={15} className="text-gold-600" /> {t.app.settings.planAndLimit}</h2>
+          <Badge tone="gold">{t.common.freeBadge}</Badge>
         </div>
-        <p className="text-2xl font-extrabold text-ink-950">{aiUsed} <span className="text-base font-medium text-ink-400">/ {aiLimit} запросов в месяц</span></p>
+        <p className="text-2xl font-extrabold text-ink-950">{aiUsed} <span className="text-base font-medium text-ink-400">/ {aiLimit} {t.app.settings.requestsPerMonth}</span></p>
         <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-ink-100">
           <div className="h-full rounded-full bg-gradient-to-r from-gold-500 to-gold-600" style={{ width: `${usagePct}%` }} />
         </div>
         <div className="mt-4 rounded-xl border border-ink-100 bg-ink-50/60 p-3.5 text-xs leading-relaxed text-ink-500">
-          Бесплатный уровень ИИ-провайдера может использовать данные запросов для улучшения моделей. Для реальных документов клиентов — платный тариф.
+          {t.app.settings.freeProviderNote}
         </div>
-        <Button variant="outline" size="sm" className="mt-4">Перейти на Про</Button>
+        <Button variant="outline" size="sm" className="mt-4">{t.app.settings.upgradeToPro}</Button>
       </Card>
 
       <Card className="p-6">
-        <h2 className="mb-2 flex items-center gap-2 text-sm font-bold text-ink-900"><ShieldCheck size={15} /> Защита данных</h2>
+        <h2 className="mb-2 flex items-center gap-2 text-sm font-bold text-ink-900"><ShieldCheck size={15} /> {t.app.settings.dataProtection}</h2>
         <p className="text-xs leading-relaxed text-ink-500">
-          Ролевой доступ: вы видите только свои дела. Шифрование данных в покое и при передаче. Полное удаление документа по запросу — реальное уничтожение содержимого, а не архивирование.
+          {t.app.settings.dataProtectionText}
         </p>
       </Card>
 
       <Card className="p-6">
-        <h2 className="mb-4 flex items-center gap-2 text-sm font-bold text-ink-900"><ClipboardList size={15} /> Журнал аудита</h2>
+        <h2 className="mb-4 flex items-center gap-2 text-sm font-bold text-ink-900"><ClipboardList size={15} /> {t.app.settings.auditLog}</h2>
         <div className="space-y-3">
-          {audit.slice(0, 8).map((a) => (
-            <div key={a.id} className="flex items-start justify-between gap-3 border-b border-ink-50 pb-3 text-xs last:border-0">
-              <div>
-                <p className="font-semibold text-ink-800">{a.action}</p>
-                <p className="text-ink-400">{a.target}</p>
+          {audit.slice(0, 8).map((a) => {
+            const { action, target } = localizeAuditEntry(a, t)
+            return (
+              <div key={a.id} className="flex items-start justify-between gap-3 border-b border-ink-50 pb-3 text-xs last:border-0">
+                <div>
+                  <p className="font-semibold text-ink-800">{action}</p>
+                  <p className="text-ink-400">{target}</p>
+                </div>
+                <div className="shrink-0 text-right text-ink-400">
+                  <p>{a.actor}</p>
+                  <p>{a.date}</p>
+                </div>
               </div>
-              <div className="shrink-0 text-right text-ink-400">
-                <p>{a.actor}</p>
-                <p>{a.date}</p>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </Card>
 
       <Card className="p-6">
-        <h2 className="mb-2 text-sm font-bold text-ink-900">Демо-данные</h2>
-        <p className="mb-4 text-xs text-ink-500">Сбросить все изменения в этом браузере и вернуть исходные демо-данные.</p>
-        <Button variant="outline" size="sm" icon={<RotateCcw size={14} />} onClick={resetDemoData}>Сбросить демо-данные</Button>
+        <h2 className="mb-2 text-sm font-bold text-ink-900">{t.app.settings.demoData}</h2>
+        <p className="mb-4 text-xs text-ink-500">{t.app.settings.demoDataText}</p>
+        <Button variant="outline" size="sm" icon={<RotateCcw size={14} />} onClick={resetDemoData}>{t.app.settings.resetDemoData}</Button>
       </Card>
     </div>
   )

@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import { useNavigate, useSearchParams, Navigate } from 'react-router-dom'
-import { ScrollText, Mail, Lock, User2, ArrowRight, ShieldCheck } from 'lucide-react'
+import { Mail, Lock, User2, ArrowRight, ShieldCheck } from 'lucide-react'
 import { Logo } from '@/components/Logo'
 import { Button } from '@/components/ui/Button'
 import { Field, Input } from '@/components/ui/Input'
+import { WritingDocument } from '@/components/landing/WritingDocument'
 import { useAuth } from '@/lib/store'
+import { useT } from '@/lib/i18n/context'
 
 export default function Login() {
+  const t = useT()
   const [params, setParams] = useSearchParams()
   const isRegister = params.get('mode') === 'register'
   const { login, isAuthenticated } = useAuth()
@@ -34,14 +37,14 @@ export default function Login() {
         <div className="absolute inset-0 bg-[radial-gradient(60%_50%_at_20%_10%,rgba(212,169,76,0.14),transparent)]" />
         <Logo dark />
         <div className="relative max-w-md">
-          <ScrollText size={36} className="mb-6 text-gold-400" />
+          <WritingDocument className="mb-8" />
           <p className="font-serif-display text-2xl leading-snug text-white">
-            «ИИ не заменяет юриста и не подписывает документы — он собирает первый черновик и снимает рутину».
+            {t.app.login.quote}
           </p>
-          <p className="mt-4 text-sm text-ink-400">Ключевой принцип продукта ШартномаЁр</p>
+          <p className="mt-4 text-sm text-ink-400">{t.app.login.quoteAuthor}</p>
         </div>
         <div className="relative flex items-center gap-2 text-xs text-ink-400">
-          <ShieldCheck size={16} className="text-gold-400" /> Данные клиентов защищены шифрованием и ролевым доступом
+          <ShieldCheck size={16} className="text-gold-400" /> {t.app.login.dataProtected}
         </div>
       </div>
 
@@ -50,27 +53,27 @@ export default function Login() {
           <div className="mb-8 lg:hidden">
             <Logo />
           </div>
-          <h1 className="text-2xl font-bold text-ink-950">{isRegister ? 'Создать аккаунт' : 'Вход в кабинет'}</h1>
+          <h1 className="text-2xl font-bold text-ink-950">{isRegister ? t.app.login.createAccount : t.app.login.signIn}</h1>
           <p className="mt-1.5 text-sm text-ink-500">
-            {isRegister ? 'Демо-режим — данные сохраняются только в этом браузере.' : 'Рады видеть снова. Демо-вход — любой email и пароль.'}
+            {isRegister ? t.app.login.registerNote : t.app.login.loginNote}
           </p>
 
           <form onSubmit={submit} className="mt-8 space-y-4">
             {isRegister && (
-              <Field label="Полное имя">
+              <Field label={t.app.login.fullName}>
                 <div className="relative">
                   <User2 size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-300" />
                   <Input className="pl-10" value={name} onChange={(e) => setName(e.target.value)} placeholder="Фарход Расулов" required />
                 </div>
               </Field>
             )}
-            <Field label="Email">
+            <Field label={t.app.login.email}>
               <div className="relative">
                 <Mail size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-300" />
                 <Input className="pl-10" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@firm.tj" required />
               </div>
             </Field>
-            <Field label="Пароль">
+            <Field label={t.app.login.password}>
               <div className="relative">
                 <Lock size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-300" />
                 <Input className="pl-10" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
@@ -78,17 +81,17 @@ export default function Login() {
             </Field>
 
             <Button type="submit" className="mt-2 w-full" size="lg" disabled={loading} iconRight={<ArrowRight size={17} />}>
-              {loading ? 'Входим…' : isRegister ? 'Зарегистрироваться' : 'Войти'}
+              {loading ? t.app.login.signingIn : isRegister ? t.common.register : t.common.login}
             </Button>
           </form>
 
           <p className="mt-6 text-center text-sm text-ink-500">
-            {isRegister ? 'Уже есть аккаунт?' : 'Ещё нет аккаунта?'}{' '}
+            {isRegister ? t.app.login.hasAccount : t.app.login.noAccount}{' '}
             <button
               className="font-semibold text-ink-900 underline decoration-gold-400 decoration-2 underline-offset-2"
               onClick={() => setParams(isRegister ? {} : { mode: 'register' })}
             >
-              {isRegister ? 'Войти' : 'Зарегистрироваться'}
+              {isRegister ? t.common.login : t.common.register}
             </button>
           </p>
         </div>

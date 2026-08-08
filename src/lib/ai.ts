@@ -1,15 +1,9 @@
-import { fillClauses } from '@/data/seed'
+import type { Dict } from '@/lib/i18n'
+import { localizedFillClauses } from '@/lib/seedText'
 
-export function simulateAiGeneration(templateId: string, values: Record<string, string>): Promise<string> {
+export function simulateAiGeneration(templateId: string, values: Record<string, string>, t: Dict): Promise<string> {
   return new Promise((resolve) => {
     const delay = 1600 + Math.random() * 900
-    setTimeout(() => resolve(fillClauses(templateId, values)), delay)
+    setTimeout(() => resolve(localizedFillClauses(templateId, values, t)), delay)
   })
 }
-
-export const aiStages = [
-  'Анализ описания сделки…',
-  'Подбор пунктов из библиотеки шаблонов…',
-  'Сборка черновика договора…',
-  'Проверка на противоречия…',
-]

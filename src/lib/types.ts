@@ -6,10 +6,13 @@ export interface Lawyer {
   plan: 'free' | 'pro'
 }
 
+export type ClientStatus = 'active' | 'potential' | 'archived'
+
 export interface Client {
   id: string
   name: string
   type: 'individual' | 'company'
+  status: ClientStatus
   contact: string
   note?: string
   createdAt: string

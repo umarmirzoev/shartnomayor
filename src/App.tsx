@@ -4,6 +4,11 @@ import AppLayout from '@/layouts/AppLayout'
 
 import Landing from '@/pages/Landing'
 import NotFound from '@/pages/NotFound'
+import Features from '@/pages/marketing/Features'
+import HowItWorksPage from '@/pages/marketing/HowItWorks'
+import TemplatesPage from '@/pages/marketing/Templates'
+import PricingPage from '@/pages/marketing/Pricing'
+import FaqPage from '@/pages/marketing/Faq'
 
 import Login from '@/pages/app/Login'
 import Dashboard from '@/pages/app/Dashboard'
@@ -22,6 +27,11 @@ export default function App() {
     <Routes>
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Landing />} />
+        <Route path="/features" element={<Features />} />
+        <Route path="/how-it-works" element={<HowItWorksPage />} />
+        <Route path="/templates" element={<TemplatesPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/faq" element={<FaqPage />} />
       </Route>
 
       <Route path="/app/login" element={<Login />} />

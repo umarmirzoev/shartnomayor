@@ -88,11 +88,11 @@ export const seedClauses: ClauseBlock[] = [
 ]
 
 export const seedClients: Client[] = [
-  { id: 'cli-1', name: 'ООО «Помир Технолоджис»', type: 'company', contact: '+992 37 221 4501 · info@pomir-tech.tj', note: 'IT-компания, разработка ПО', createdAt: '2026-05-14' },
-  { id: 'cli-2', name: 'Каримов Комрон Каримович', type: 'individual', contact: '+992 93 500 1188', note: 'Собственник коммерческой недвижимости', createdAt: '2026-06-02' },
-  { id: 'cli-3', name: 'ООО «Заравшон Трейд»', type: 'company', contact: '+992 44 600 7712 · office@zarafshon-trade.tj', createdAt: '2026-06-20' },
-  { id: 'cli-4', name: 'ИП Назарова Ситора', type: 'individual', contact: '+992 98 777 3320', note: 'Розничная торговля', createdAt: '2026-07-01' },
-  { id: 'cli-5', name: 'ООО «Сомон Логистика»', type: 'company', contact: '+992 37 224 9090 · hr@somon-logistics.tj', createdAt: '2026-07-18' },
+  { id: 'cli-1', name: 'ООО «Помир Технолоджис»', type: 'company', status: 'active', contact: '+992 37 221 4501 · info@pomir-tech.tj', note: 'IT-компания, разработка ПО', createdAt: '2026-05-14' },
+  { id: 'cli-2', name: 'Каримов Комрон Каримович', type: 'individual', status: 'active', contact: '+992 93 500 1188', note: 'Собственник коммерческой недвижимости', createdAt: '2026-06-02' },
+  { id: 'cli-3', name: 'ООО «Заравшон Трейд»', type: 'company', status: 'active', contact: '+992 44 600 7712 · office@zarafshon-trade.tj', createdAt: '2026-06-20' },
+  { id: 'cli-4', name: 'ИП Назарова Ситора', type: 'individual', status: 'potential', contact: '+992 98 777 3320', note: 'Розничная торговля', createdAt: '2026-07-01' },
+  { id: 'cli-5', name: 'ООО «Сомон Логистика»', type: 'company', status: 'archived', contact: '+992 37 224 9090 · hr@somon-logistics.tj', createdAt: '2026-07-18' },
 ]
 
 export const seedCases: Case[] = [

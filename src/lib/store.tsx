@@ -1,9 +1,16 @@
+// Демо-хранилище: все данные сейчас живут в localStorage. Когда бэкенд будет
+// готов, это единственный файл, который нужно менять — см. src/lib/api.ts
+// для готового типизированного клиента (api.clients, api.drafts и т.д.) и
+// api.isConfigured() для переключения между демо- и реальным режимом.
+// Компоненты используют только useAppData()/useAuth() и не завязаны на
+// конкретный источник данных.
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { Client, Case, Draft, DocumentVersion, LegislationAlert, AuditLogEntry } from '@/lib/types'
 import {
   seedClients, seedCases, seedDrafts, seedVersions, seedAlerts, seedAudit,
   seedTemplates, seedClauses, seedLawyer, seedAiUsage,
 } from '@/data/seed'
+import { useT } from '@/lib/i18n/context'
 
 const LS_KEY = 'shartnomayor_state_v1'
 const AUTH_KEY = 'shartnomayor_auth_v1'
@@ -42,6 +49,7 @@ interface Ctx extends State {
   lawyer: typeof seedLawyer
   aiLimit: number
   addClient: (c: Omit<Client, 'id' | 'createdAt'>) => Client
+  updateClient: (id: string, patch: Partial<Client>) => void
   addCase: (c: Omit<Case, 'id' | 'createdAt'>) => Case
   addDraft: (d: Omit<Draft, 'id' | 'createdAt' | 'updatedAt'>) => Draft
   addVersion: (v: Omit<DocumentVersion, 'id' | 'createdAt' | 'number'>) => DocumentVersion
@@ -55,6 +63,7 @@ interface Ctx extends State {
 const AppDataContext = createContext<Ctx | null>(null)
 
 export function AppDataProvider({ children }: { children: ReactNode }) {
+  const t = useT()
   const [state, setState] = useState<State>(loadInitial)
 
   useEffect(() => {
@@ -80,13 +89,20 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     addClient: (c) => {
       const client: Client = { ...c, id: `cli-${Date.now()}`, createdAt: new Date().toISOString().slice(0, 10) }
       setState((s) => ({ ...s, clients: [client, ...s.clients] }))
-      logAudit('Добавлен новый клиент', client.name)
+      logAudit(t.audit.addClient, client.name)
       return client
+    },
+    updateClient: (id, patch) => {
+      setState((s) => ({ ...s, clients: s.clients.map((c) => (c.id === id ? { ...c, ...patch } : c)) }))
+      if (patch.status) {
+        const target = state.clients.find((c) => c.id === id)
+        if (target) logAudit(t.audit.statusChanged, target.name)
+      }
     },
     addCase: (c) => {
       const item: Case = { ...c, id: `case-${Date.now()}`, createdAt: new Date().toISOString().slice(0, 10) }
       setState((s) => ({ ...s, cases: [item, ...s.cases] }))
-      logAudit('Создано новое дело', item.title)
+      logAudit(t.audit.addCase, item.title)
       return item
     },
     addDraft: (d) => {
@@ -97,7 +113,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         updatedAt: new Date().toISOString().slice(0, 10),
       }
       setState((s) => ({ ...s, drafts: [item, ...s.drafts] }))
-      logAudit('Создан черновик по описанию сделки (ИИ)', item.title)
+      logAudit(t.audit.addDraftAi, item.title)
       return item
     },
     addVersion: (v) => {
@@ -114,7 +130,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         versions: [...s.versions, version],
         drafts: s.drafts.map((d) => (d.id === v.draftId ? { ...d, currentVersionId: version.id, updatedAt: new Date().toISOString().slice(0, 10) } : d)),
       }))
-      logAudit('Изменена версия черновика', v.note || 'Ручная правка')
+      logAudit(t.audit.editVersion, v.note || t.audit.manualEdit)
       return version
     },
     updateDraft: (id, patch) => {
@@ -129,7 +145,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem(LS_KEY)
       setState(loadInitial())
     },
-  }), [state])
+  }), [state, t])
 
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>
 }

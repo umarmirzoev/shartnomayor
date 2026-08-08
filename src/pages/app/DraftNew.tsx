@@ -6,15 +6,19 @@ import { Button } from '@/components/ui/Button'
 import { Field, Input, Select, Textarea } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
 import { useAppData } from '@/lib/store'
-import { simulateAiGeneration, aiStages } from '@/lib/ai'
+import { simulateAiGeneration } from '@/lib/ai'
 import { parseContent } from '@/lib/format'
+import { useT } from '@/lib/i18n/context'
+import { localizedTemplates, localizeCaseTitle } from '@/lib/seedText'
 import * as Icons from 'lucide-react'
 
-const steps = ['Дело и шаблон', 'Описание сделки', 'Сборка ИИ', 'Проверка']
-
 export default function DraftNew() {
-  const { cases, clients, templates, addDraft, addVersion, incAiUsage, aiUsed, aiLimit } = useAppData()
+  const t = useT()
+  const { cases, clients, addDraft, addVersion, incAiUsage, aiUsed, aiLimit } = useAppData()
+  const templates = useMemo(() => localizedTemplates(t), [t])
   const navigate = useNavigate()
+  const steps = t.app.draftNew.steps
+  const aiStages = t.app.draftNew.stages
 
   const [step, setStep] = useState(0)
   const [caseId, setCaseId] = useState(cases[0]?.id || '')
@@ -25,7 +29,7 @@ export default function DraftNew() {
   const [stageIdx, setStageIdx] = useState(0)
   const [generated, setGenerated] = useState('')
 
-  const template = templates.find((t) => t.id === templateId)!
+  const template = templates.find((tp) => tp.id === templateId)!
   const activeCase = cases.find((c) => c.id === caseId)
   const client = clients.find((c) => c.id === activeCase?.clientId)
   const limitReached = aiUsed >= aiLimit
@@ -38,7 +42,7 @@ export default function DraftNew() {
     setGenerating(true)
     setStageIdx(0)
     const interval = setInterval(() => setStageIdx((i) => Math.min(i + 1, aiStages.length - 1)), 700)
-    const content = await simulateAiGeneration(templateId, fieldValues)
+    const content = await simulateAiGeneration(templateId, fieldValues, t)
     clearInterval(interval)
     setGenerated(content)
     incAiUsage()
@@ -50,50 +54,50 @@ export default function DraftNew() {
     const draft = addDraft({
       caseId,
       templateId,
-      title: `${template.title} — ${client?.name || 'Новый черновик'}`,
+      title: `${template.title} — ${client?.name || t.app.draftNew.newDraftFallback}`,
       status: 'draft',
       currentVersionId: '',
       responsibilityConfirmed: false,
     })
-    addVersion({ draftId: draft.id, content: generated, note: 'Черновик собран ИИ по описанию сделки', author: 'ИИ-ассистент' })
+    addVersion({ draftId: draft.id, content: generated, note: t.audit.addDraftAi, author: 'ИИ-ассистент' })
     navigate(`/app/drafts/${draft.id}`)
   }
 
   return (
     <div className="mx-auto max-w-3xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-ink-950">Новый черновик</h1>
-        <p className="mt-1 text-sm text-ink-500">Опишите сделку — ИИ соберёт черновик из библиотеки проверенных пунктов.</p>
+        <h1 className="text-2xl font-bold text-ink-950">{t.app.draftNew.title}</h1>
+        <p className="mt-1 text-sm text-ink-500">{t.app.draftNew.subtitle}</p>
       </div>
 
-      <Steps step={step} />
+      <Steps step={step} steps={steps} />
 
       {step === 0 && (
         <Card className="mt-6 p-6">
           <div className="space-y-5">
-            <Field label="Дело" required hint={cases.length === 0 ? 'Сначала создайте клиента и дело' : undefined}>
+            <Field label={t.app.draftNew.caseLabel} required hint={cases.length === 0 ? t.app.draftNew.caseHint : undefined}>
               <Select value={caseId} onChange={(e) => setCaseId(e.target.value)}>
                 {cases.map((c) => {
                   const cl = clients.find((x) => x.id === c.clientId)
-                  return <option key={c.id} value={c.id}>{c.title} — {cl?.name}</option>
+                  return <option key={c.id} value={c.id}>{localizeCaseTitle(c, t)} — {cl?.name}</option>
                 })}
               </Select>
             </Field>
 
             <div>
-              <span className="mb-2 block text-sm font-semibold text-ink-800">Тип договора</span>
+              <span className="mb-2 block text-sm font-semibold text-ink-800">{t.app.draftNew.contractType}</span>
               <div className="grid grid-cols-2 gap-3">
-                {templates.map((t) => {
-                  const active = t.id === templateId
+                {templates.map((tpl) => {
+                  const active = tpl.id === templateId
                   return (
                     <button
-                      key={t.id}
-                      onClick={() => setTemplateId(t.id)}
+                      key={tpl.id}
+                      onClick={() => setTemplateId(tpl.id)}
                       className={`rounded-xl border p-4 text-left transition ${active ? 'border-ink-900 bg-ink-50 ring-1 ring-ink-900' : 'border-ink-200 hover:border-ink-400'}`}
                     >
                       <FileStack size={16} className={active ? 'text-gold-600' : 'text-ink-400'} />
-                      <p className="mt-2 text-sm font-bold text-ink-900">{t.title}</p>
-                      <p className="mt-0.5 text-xs text-ink-400">{t.category}</p>
+                      <p className="mt-2 text-sm font-bold text-ink-900">{tpl.title}</p>
+                      <p className="mt-0.5 text-xs text-ink-400">{tpl.category}</p>
                     </button>
                   )
                 })}
@@ -101,7 +105,7 @@ export default function DraftNew() {
             </div>
           </div>
           <div className="mt-6 flex justify-end">
-            <Button disabled={!canStep0} onClick={() => setStep(1)} iconRight={<ArrowRight size={16} />}>Далее</Button>
+            <Button disabled={!canStep0} onClick={() => setStep(1)} iconRight={<ArrowRight size={16} />}>{t.app.draftNew.next}</Button>
           </div>
         </Card>
       )}
@@ -109,12 +113,12 @@ export default function DraftNew() {
       {step === 1 && (
         <Card className="mt-6 p-6">
           <div className="space-y-5">
-            <Field label="Опишите сделку своими словами" required hint="Например: кто стороны, что за сделка, ключевые условия">
+            <Field label={t.app.draftNew.dealLabel} required hint={t.app.draftNew.dealHint}>
               <Textarea
                 rows={4}
                 value={dealDescription}
                 onChange={(e) => setDealDescription(e.target.value)}
-                placeholder={`Например: ${client?.name || 'Клиент'} заключает ${template.title.toLowerCase()} с контрагентом. Нужно предусмотреть...`}
+                placeholder={`${t.app.draftNew.dealPlaceholder}: ${client?.name || t.app.draftNew.client} ${template.title.toLowerCase()}...`}
               />
             </Field>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -130,11 +134,11 @@ export default function DraftNew() {
             </div>
           </div>
           <div className="mt-6 flex items-center justify-between">
-            <Button variant="ghost" onClick={() => setStep(0)} icon={<ArrowLeft size={16} />}>Назад</Button>
+            <Button variant="ghost" onClick={() => setStep(0)} icon={<ArrowLeft size={16} />}>{t.app.draftNew.back}</Button>
             {limitReached ? (
-              <Badge tone="red">Лимит ИИ-запросов исчерпан на этот месяц</Badge>
+              <Badge tone="red">{t.app.draftNew.limitReached}</Badge>
             ) : (
-              <Button disabled={!canStep1} onClick={runGeneration} icon={<Sparkles size={16} />}>Собрать черновик ИИ</Button>
+              <Button disabled={!canStep1} onClick={runGeneration} icon={<Sparkles size={16} />}>{t.app.draftNew.buildDraft}</Button>
             )}
           </div>
         </Card>
@@ -148,7 +152,7 @@ export default function DraftNew() {
           </div>
           <div>
             <p className="text-sm font-bold text-ink-900">{aiStages[stageIdx]}</p>
-            <p className="mt-1 text-xs text-ink-400">Порт IAiDraftingService → GeminiAiDraftingService</p>
+            <p className="mt-1 text-xs text-ink-400">{t.app.draftNew.aiPort}</p>
           </div>
           <div className="flex gap-2">
             {aiStages.map((_, i) => (
@@ -163,7 +167,7 @@ export default function DraftNew() {
           <Card className="p-6">
             <div className="mb-4 flex items-center gap-2 text-emerald-600">
               <CheckCircle2 size={18} />
-              <p className="text-sm font-bold">Черновик собран из {parseContent(generated).length} пунктов библиотеки</p>
+              <p className="text-sm font-bold">{t.app.draftNew.assembledFrom} {parseContent(generated).length} {t.app.draftNew.libraryClauses}</p>
             </div>
             <div className="max-h-96 space-y-4 overflow-y-auto rounded-xl border border-ink-100 bg-ink-50/50 p-5">
               {parseContent(generated).map((b, i) => (
@@ -175,8 +179,8 @@ export default function DraftNew() {
             </div>
           </Card>
           <div className="mt-6 flex items-center justify-between">
-            <Button variant="ghost" onClick={() => setStep(1)} icon={<ArrowLeft size={16} />}>Изменить вводные</Button>
-            <Button onClick={createDraft} iconRight={<ArrowRight size={16} />}>Открыть в редакторе</Button>
+            <Button variant="ghost" onClick={() => setStep(1)} icon={<ArrowLeft size={16} />}>{t.app.draftNew.editInputs}</Button>
+            <Button onClick={createDraft} iconRight={<ArrowRight size={16} />}>{t.app.draftNew.openEditor}</Button>
           </div>
         </div>
       )}
@@ -184,7 +188,7 @@ export default function DraftNew() {
   )
 }
 
-function Steps({ step }: { step: number }) {
+function Steps({ step, steps }: { step: number; steps: readonly string[] }) {
   return (
     <div className="flex items-center">
       {steps.map((label, i) => (

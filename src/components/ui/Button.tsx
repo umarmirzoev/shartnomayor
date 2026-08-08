@@ -9,11 +9,11 @@ type Size = 'sm' | 'md' | 'lg'
 const base = 'inline-flex items-center justify-center gap-2 font-semibold rounded-xl transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap select-none'
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-ink-900 text-white hover:bg-ink-800 shadow-soft active:scale-[0.98]',
+  primary: 'bg-ink-900 text-white hover:bg-ink-800 shadow-soft active:scale-[0.98] dark:bg-white dark:text-ink-950 dark:hover:bg-ink-100',
   secondary: 'bg-gold-500 text-ink-950 hover:bg-gold-400 shadow-soft active:scale-[0.98]',
-  outline: 'border border-ink-200 text-ink-900 hover:border-ink-400 hover:bg-ink-50 active:scale-[0.98]',
-  ghost: 'text-ink-600 hover:bg-ink-100 hover:text-ink-900',
-  danger: 'bg-red-50 text-red-600 hover:bg-red-100',
+  outline: 'border border-ink-200 text-ink-900 hover:border-ink-400 hover:bg-ink-50 active:scale-[0.98] dark:border-white/15 dark:text-white dark:hover:border-white/30 dark:hover:bg-white/5',
+  ghost: 'text-ink-600 hover:bg-ink-100 hover:text-ink-900 dark:text-ink-300 dark:hover:bg-white/10 dark:hover:text-white',
+  danger: 'bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/20',
 }
 
 const sizes: Record<Size, string> = {

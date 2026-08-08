@@ -1,6 +1,18 @@
+import type { Template } from '@/lib/types'
+
 export interface ContentBlock {
   heading: string
   body: string
+}
+
+// Заменяет {{ключ}} в тексте пункта примерами значений полей шаблона —
+// для отображения пользователю. Сырые {{placeholder}} наружу не показываем.
+export function fillClausePreview(body: string, fields: Template['fields']): string {
+  let result = body
+  fields.forEach((f) => {
+    result = result.replaceAll(`{{${f.key}}}`, f.placeholder)
+  })
+  return result
 }
 
 // Parses "## Heading\nBody text" blocks separated by blank lines.

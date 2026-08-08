@@ -2,7 +2,16 @@ import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } fro
 import { saveAs } from 'file-saver'
 import { parseContent } from '@/lib/format'
 
-export async function exportDraftToDocx(title: string, content: string, meta: { caseTitle: string; clientName: string; date: string }) {
+interface ExportMeta {
+  caseTitle: string
+  clientName: string
+  date: string
+  cityLine: string
+  signature1: string
+  signature2: string
+}
+
+export async function exportDraftToDocx(title: string, content: string, meta: ExportMeta) {
   const blocks = parseContent(content)
 
   const children: Paragraph[] = [
@@ -14,7 +23,7 @@ export async function exportDraftToDocx(title: string, content: string, meta: { 
     new Paragraph({
       alignment: AlignmentType.CENTER,
       spacing: { after: 400 },
-      children: [new TextRun({ text: `г. Душанбе, ${meta.date}`, size: 20, color: '565F96' })],
+      children: [new TextRun({ text: `${meta.cityLine}, ${meta.date}`, size: 20, color: '565F96' })],
     }),
   ]
 
@@ -41,9 +50,9 @@ export async function exportDraftToDocx(title: string, content: string, meta: { 
 
   children.push(
     new Paragraph({ spacing: { before: 600 }, children: [new TextRun({ text: '_________________________', size: 22 })] }),
-    new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: 'Подпись стороны 1', size: 20, italics: true, color: '565F96' })] }),
+    new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: meta.signature1, size: 20, italics: true, color: '565F96' })] }),
     new Paragraph({ spacing: { before: 400 }, children: [new TextRun({ text: '_________________________', size: 22 })] }),
-    new Paragraph({ children: [new TextRun({ text: 'Подпись стороны 2', size: 20, italics: true, color: '565F96' })] })
+    new Paragraph({ children: [new TextRun({ text: meta.signature2, size: 20, italics: true, color: '565F96' })] })
   )
 
   const doc = new Document({
