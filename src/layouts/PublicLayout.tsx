@@ -5,6 +5,7 @@ import { Logo } from '@/components/Logo'
 import { ButtonLink } from '@/components/ui/Button'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
+import { AiAssistantWidget } from '@/components/ui/AiAssistantWidget'
 import { useT, useLanguage } from '@/lib/i18n/context'
 import { chromeLabels } from '@/lib/i18n'
 import clsx from 'clsx'
@@ -137,6 +138,7 @@ export default function PublicLayout() {
       </main>
 
       <Footer />
+      <AiAssistantWidget />
     </div>
   )
 }

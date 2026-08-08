@@ -10,6 +10,7 @@ import { useAuth, useAppData } from '@/lib/store'
 import { Badge } from '@/components/ui/Badge'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
+import { AiAssistantWidget } from '@/components/ui/AiAssistantWidget'
 import { useT } from '@/lib/i18n/context'
 
 export default function AppLayout() {
@@ -121,6 +122,7 @@ export default function AppLayout() {
           <Outlet />
         </main>
       </div>
+      <AiAssistantWidget />
     </div>
   )
 }
