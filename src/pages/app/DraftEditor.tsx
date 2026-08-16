@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
   ArrowLeft, Save, RefreshCcw, FileDown, Printer, History, ShieldAlert, CheckSquare, Square, Sparkles,
 } from 'lucide-react'
+import { saveAs } from 'file-saver'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
@@ -12,14 +13,19 @@ import { statusBadge, statusLabel } from '@/lib/labels'
 import { exportDraftToDocx } from '@/lib/exportDocx'
 import { useT, useLanguage } from '@/lib/i18n/context'
 import { cityLine } from '@/lib/i18n'
-import { localizedTemplates, localizeDraftTitle, localizeCaseTitle, localizeVersionNote } from '@/lib/seedText'
+import { localizeDraftTitle, localizeCaseTitle, localizeVersionNote } from '@/lib/seedText'
+import { api } from '@/lib/api'
 
 export default function DraftEditor() {
   const t = useT()
   const { lang } = useLanguage()
   const { id } = useParams()
-  const { drafts, versions, cases, clients, addVersion, updateDraft, logAudit } = useAppData()
-  const templates = useMemo(() => localizedTemplates(t), [t])
+  const { drafts, versions, cases, clients, templates, addVersion, updateDraft, logAudit, isRealBackend, loadDraftVersions } = useAppData()
+
+  useEffect(() => {
+    if (isRealBackend && id) void loadDraftVersions(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRealBackend, id])
   const draft = drafts.find((d) => d.id === id)
 
   const draftVersions = useMemo(
@@ -43,25 +49,34 @@ export default function DraftEditor() {
   const draftTitle = localizeDraftTitle(draft, t)
   const caseTitle = relatedCase ? localizeCaseTitle(relatedCase, t) : ''
 
-  const saveEdit = () => {
-    addVersion({ draftId: draft.id, content: draftText, note: t.app.draftEditor.manualEditNote, author: 'Фарход Расулов' })
+  const saveEdit = async () => {
+    await addVersion({ draftId: draft.id, content: draftText, note: t.app.draftEditor.manualEditNote, author: 'Фарход Расулов' })
     setEditing(false)
-    updateDraft(draft.id, { status: draft.status === 'draft' ? 'in_review' : draft.status })
+    await updateDraft(draft.id, { status: draft.status === 'draft' ? 'in_review' : draft.status })
   }
 
   const doExportDocx = async () => {
     setExporting(true)
-    await exportDraftToDocx(draftTitle, displayedVersion.content, {
-      caseTitle,
-      clientName: client?.name || '',
-      date: new Date().toLocaleDateString('ru-RU'),
-      cityLine: cityLine[lang],
-      signature1: t.app.draftEditor.signature1,
-      signature2: t.app.draftEditor.signature2,
-    })
-    logAudit(t.audit.exportDocx, draftTitle)
-    updateDraft(draft.id, { status: 'exported' })
-    setExporting(false)
+    try {
+      if (isRealBackend) {
+        // Боевой режим: файл собирает бэкенд (QuestPDF/OpenXml), фронтенд только скачивает Blob.
+        const { blob, fileName } = await api.drafts.export(draft.id, 'Docx')
+        saveAs(blob, fileName || `${draftTitle.replace(/[^\p{L}\p{N}\- ]/gu, '').trim().replace(/\s+/g, '_')}.docx`)
+      } else {
+        await exportDraftToDocx(draftTitle, displayedVersion.content, {
+          caseTitle,
+          clientName: client?.name || '',
+          date: new Date().toLocaleDateString('ru-RU'),
+          cityLine: cityLine[lang],
+          signature1: t.app.draftEditor.signature1,
+          signature2: t.app.draftEditor.signature2,
+        })
+      }
+      logAudit(t.audit.exportDocx, draftTitle)
+      await updateDraft(draft.id, { status: 'exported' })
+    } finally {
+      setExporting(false)
+    }
   }
 
   const doPrint = () => {

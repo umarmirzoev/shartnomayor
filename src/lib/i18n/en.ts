@@ -514,6 +514,7 @@ export const en = {
       steps: ['Case and template', 'Deal description', 'AI assembly', 'Review'],
       caseLabel: 'Case',
       caseHint: 'Create a client and a case first',
+      goToClients: 'Go to clients',
       contractType: 'Contract type',
       next: 'Next',
       dealLabel: 'Describe the deal in your own words',

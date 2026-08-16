@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Sparkles, ArrowRight, ArrowLeft, CheckCircle2, Loader2, FileStack } from 'lucide-react'
+import { Sparkles, ArrowRight, ArrowLeft, CheckCircle2, Loader2, FileStack, Search } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Field, Input, Select, Textarea } from '@/components/ui/Input'
@@ -9,27 +9,40 @@ import { useAppData } from '@/lib/store'
 import { simulateAiGeneration } from '@/lib/ai'
 import { parseContent } from '@/lib/format'
 import { useT } from '@/lib/i18n/context'
-import { localizedTemplates, localizeCaseTitle } from '@/lib/seedText'
+import { localizeCaseTitle } from '@/lib/seedText'
 import * as Icons from 'lucide-react'
 
 export default function DraftNew() {
   const t = useT()
-  const { cases, clients, addDraft, addVersion, incAiUsage, aiUsed, aiLimit } = useAppData()
-  const templates = useMemo(() => localizedTemplates(t), [t])
+  const { cases, clients, templates, addDraft, addVersion, incAiUsage, aiUsed, aiLimit, isRealBackend } = useAppData()
   const navigate = useNavigate()
   const steps = t.app.draftNew.steps
   const aiStages = t.app.draftNew.stages
 
   const [step, setStep] = useState(0)
   const [caseId, setCaseId] = useState(cases[0]?.id || '')
-  const [templateId, setTemplateId] = useState(templates[0].id)
+  const [templateId, setTemplateId] = useState(templates[0]?.id || '')
+  const [templateQuery, setTemplateQuery] = useState('')
   const [dealDescription, setDealDescription] = useState('')
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({})
   const [generating, setGenerating] = useState(false)
   const [stageIdx, setStageIdx] = useState(0)
   const [generated, setGenerated] = useState('')
+  const [realDraftId, setRealDraftId] = useState<string | null>(null)
 
-  const template = templates.find((tp) => tp.id === templateId)!
+  // Список шаблонов приходит асинхронно из useAppData() в боевом режиме — как только он
+  // загрузится, подставляем первый шаблон по умолчанию, если ничего ещё не выбрано.
+  useEffect(() => {
+    if (!templateId && templates[0]) setTemplateId(templates[0].id)
+  }, [templateId, templates])
+
+  const filteredTemplates = useMemo(() => {
+    const q = templateQuery.trim().toLowerCase()
+    if (!q) return templates
+    return templates.filter((tp) => tp.title.toLowerCase().includes(q) || tp.category.toLowerCase().includes(q))
+  }, [templates, templateQuery])
+
+  const template = templates.find((tp) => tp.id === templateId)
   const activeCase = cases.find((c) => c.id === caseId)
   const client = clients.find((c) => c.id === activeCase?.clientId)
   const limitReached = aiUsed >= aiLimit
@@ -37,29 +50,55 @@ export default function DraftNew() {
   const canStep0 = !!caseId && !!templateId
   const canStep1 = dealDescription.trim().length > 8
 
+  const draftTitle = `${template?.title || ''} — ${client?.name || t.app.draftNew.newDraftFallback}`
+
   const runGeneration = async () => {
     setStep(2)
     setGenerating(true)
     setStageIdx(0)
     const interval = setInterval(() => setStageIdx((i) => Math.min(i + 1, aiStages.length - 1)), 700)
-    const content = await simulateAiGeneration(templateId, fieldValues, t)
-    clearInterval(interval)
-    setGenerated(content)
-    incAiUsage()
-    setGenerating(false)
-    setStep(3)
+    try {
+      if (isRealBackend) {
+        // Боевой режим: POST /Documents сразу создаёт черновик и первую ИИ-версию —
+        // текст реально генерирует Gemini на бэкенде (см. src/lib/store.tsx addDraft).
+        const draft = await addDraft({
+          caseId,
+          templateId,
+          title: draftTitle,
+          status: 'draft',
+          currentVersionId: '',
+          responsibilityConfirmed: false,
+          dealDescription,
+        })
+        setRealDraftId(draft.id)
+        setGenerated(draft.generatedContent || '')
+      } else {
+        const content = await simulateAiGeneration(templateId, fieldValues, t)
+        setGenerated(content)
+      }
+    } finally {
+      clearInterval(interval)
+      incAiUsage()
+      setGenerating(false)
+      setStep(3)
+    }
   }
 
-  const createDraft = () => {
-    const draft = addDraft({
+  const createDraft = async () => {
+    if (isRealBackend && realDraftId) {
+      // Черновик и версия уже созданы на сервере во время генерации — просто открываем редактор.
+      navigate(`/app/drafts/${realDraftId}`)
+      return
+    }
+    const draft = await addDraft({
       caseId,
       templateId,
-      title: `${template.title} — ${client?.name || t.app.draftNew.newDraftFallback}`,
+      title: draftTitle,
       status: 'draft',
       currentVersionId: '',
       responsibilityConfirmed: false,
     })
-    addVersion({ draftId: draft.id, content: generated, note: t.audit.addDraftAi, author: 'ИИ-ассистент' })
+    await addVersion({ draftId: draft.id, content: generated, note: t.audit.addDraftAi, author: 'ИИ-ассистент' })
     navigate(`/app/drafts/${draft.id}`)
   }
 
@@ -75,19 +114,40 @@ export default function DraftNew() {
       {step === 0 && (
         <Card className="mt-6 p-6">
           <div className="space-y-5">
-            <Field label={t.app.draftNew.caseLabel} required hint={cases.length === 0 ? t.app.draftNew.caseHint : undefined}>
-              <Select value={caseId} onChange={(e) => setCaseId(e.target.value)}>
-                {cases.map((c) => {
-                  const cl = clients.find((x) => x.id === c.clientId)
-                  return <option key={c.id} value={c.id}>{localizeCaseTitle(c, t)} — {cl?.name}</option>
-                })}
-              </Select>
-            </Field>
+            {cases.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-ink-200 bg-ink-50/60 p-5 text-center">
+                <p className="text-sm font-semibold text-ink-800">{t.app.draftNew.caseHint}</p>
+                <Button className="mt-4" onClick={() => navigate('/app/clients')}>{t.app.draftNew.goToClients}</Button>
+              </div>
+            ) : (
+              <Field label={t.app.draftNew.caseLabel} required>
+                <Select value={caseId} onChange={(e) => setCaseId(e.target.value)}>
+                  {cases.map((c) => {
+                    const cl = clients.find((x) => x.id === c.clientId)
+                    return <option key={c.id} value={c.id}>{localizeCaseTitle(c, t)} — {cl?.name}</option>
+                  })}
+                </Select>
+              </Field>
+            )}
 
             <div>
               <span className="mb-2 block text-sm font-semibold text-ink-800">{t.app.draftNew.contractType}</span>
-              <div className="grid grid-cols-2 gap-3">
-                {templates.map((tpl) => {
+              {templates.length > 8 && (
+                <div className="relative mb-3">
+                  <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-300" />
+                  <input
+                    value={templateQuery}
+                    onChange={(e) => setTemplateQuery(e.target.value)}
+                    placeholder={t.common.search}
+                    className="w-full rounded-lg border border-ink-200 py-2 pl-9 pr-3 text-sm outline-none transition focus:border-ink-400"
+                  />
+                </div>
+              )}
+              <div className="grid max-h-80 grid-cols-2 gap-3 overflow-y-auto pr-1">
+                {filteredTemplates.length === 0 && (
+                  <p className="col-span-2 text-sm text-ink-400">{t.common.notFoundShort}</p>
+                )}
+                {filteredTemplates.map((tpl) => {
                   const active = tpl.id === templateId
                   return (
                     <button
@@ -118,11 +178,11 @@ export default function DraftNew() {
                 rows={4}
                 value={dealDescription}
                 onChange={(e) => setDealDescription(e.target.value)}
-                placeholder={`${t.app.draftNew.dealPlaceholder}: ${client?.name || t.app.draftNew.client} ${template.title.toLowerCase()}...`}
+                placeholder={`${t.app.draftNew.dealPlaceholder}: ${client?.name || t.app.draftNew.client} ${(template?.title || '').toLowerCase()}...`}
               />
             </Field>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {template.fields.map((f) => (
+              {(template?.fields || []).map((f) => (
                 <Field key={f.key} label={f.label}>
                   <Input
                     value={fieldValues[f.key] || ''}

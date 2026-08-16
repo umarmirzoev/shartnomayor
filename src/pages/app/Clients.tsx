@@ -125,17 +125,17 @@ export default function Clients() {
   )
 }
 
-function NewClientModal({ open, onClose, onCreate, t }: { open: boolean; onClose: () => void; onCreate: (c: Omit<Client, 'id' | 'createdAt'>) => Client; t: Dict }) {
+function NewClientModal({ open, onClose, onCreate, t }: { open: boolean; onClose: () => void; onCreate: (c: Omit<Client, 'id' | 'createdAt'>) => Promise<Client>; t: Dict }) {
   const [name, setName] = useState('')
   const [type, setType] = useState<'individual' | 'company'>('company')
   const [status, setStatus] = useState<ClientStatus>('active')
   const [contact, setContact] = useState('')
   const [note, setNote] = useState('')
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!name.trim()) return
-    onCreate({ name, type, status, contact, note })
+    await onCreate({ name, type, status, contact, note })
     setName(''); setContact(''); setNote(''); setStatus('active')
     onClose()
   }

@@ -5,30 +5,50 @@ import { Logo } from '@/components/Logo'
 import { Button } from '@/components/ui/Button'
 import { Field, Input } from '@/components/ui/Input'
 import { WritingDocument } from '@/components/landing/WritingDocument'
-import { useAuth } from '@/lib/store'
+import { useAuth, useAppData } from '@/lib/store'
 import { useT } from '@/lib/i18n/context'
+import { isBackendConfigured } from '@/lib/api'
 
 export default function Login() {
   const t = useT()
   const [params, setParams] = useSearchParams()
   const isRegister = params.get('mode') === 'register'
-  const { login, isAuthenticated } = useAuth()
+  const { login, register, isAuthenticated } = useAuth()
+  const { reloadAll } = useAppData()
   const navigate = useNavigate()
 
   const [name, setName] = useState('Фарход Расулов')
   const [email, setEmail] = useState('farhod.rasulov@shartnomayor.tj')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   if (isAuthenticated) return <Navigate to="/app/dashboard" replace />
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
     setLoading(true)
-    setTimeout(() => {
-      login(email, name)
+    try {
+      if (isBackendConfigured()) {
+        // Боевой режим: пароль реально проверяется бэкендом, ошибка показывается пользователю.
+        if (isRegister) {
+          await register({ email, password, fullName: name })
+        } else {
+          await login(email, password)
+        }
+        await reloadAll()
+      } else {
+        // Демо-режим: любой email/пароль, задержка — чтобы не выглядело мгновенно и «ненастоящим».
+        await new Promise((resolve) => setTimeout(resolve, 600))
+        await login(email, password, name)
+      }
       navigate('/app/dashboard')
-    }, 600)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Не удалось выполнить вход.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -79,6 +99,10 @@ export default function Login() {
                 <Input className="pl-10" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
               </div>
             </Field>
+
+            {error && (
+              <p className="rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-xs text-red-600">{error}</p>
+            )}
 
             <Button type="submit" className="mt-2 w-full" size="lg" disabled={loading} iconRight={<ArrowRight size={17} />}>
               {loading ? t.app.login.signingIn : isRegister ? t.common.register : t.common.login}

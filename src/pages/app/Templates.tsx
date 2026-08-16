@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { FileStack, ChevronDown, ListChecks, Sparkles, HandCoins, Home, ScrollText, Briefcase, FileText } from 'lucide-react'
+import { FileStack, ChevronDown, ListChecks, Sparkles, HandCoins, Home, ScrollText, Briefcase, FileText, Search } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { ButtonLink } from '@/components/ui/Button'
@@ -7,7 +7,7 @@ import { fillClausePreview } from '@/lib/format'
 import type { Template } from '@/lib/types'
 import { useT } from '@/lib/i18n/context'
 import type { Dict } from '@/lib/i18n'
-import { localizedTemplates, localizedClauses } from '@/lib/seedText'
+import { useAppData } from '@/lib/store'
 
 const iconMap: Record<string, typeof HandCoins> = {
   'tpl-supply': HandCoins,
@@ -66,33 +66,54 @@ function Section({ widths }: { widths: string[] }) {
 
 export default function Templates() {
   const t = useT() as Dict
-  const templates = useMemo(() => localizedTemplates(t), [t])
-  const clauses = useMemo(() => localizedClauses(t), [t])
-  const [openId, setOpenId] = useState<string | null>(templates[0]?.id || null)
+  const { templates, clauses } = useAppData()
+  const [openId, setOpenId] = useState<string | null>(null)
+  const [query, setQuery] = useState('')
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return templates
+    return templates.filter(
+      (tpl) => tpl.title.toLowerCase().includes(q) || tpl.category.toLowerCase().includes(q)
+    )
+  }, [templates, query])
 
   return (
     <div className="max-w-4xl">
       <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
           <h1 className="text-2xl font-bold text-ink-950">{t.app.templates.title}</h1>
-          <p className="mt-1 text-sm text-ink-500">{t.app.templates.subtitle}</p>
+          <p className="mt-1 text-sm text-ink-500">{t.app.templates.subtitle} · {templates.length}</p>
         </div>
         <ButtonLink to="/app/drafts/new" icon={<Sparkles size={16} />}>{t.app.templates.createDraft}</ButtonLink>
       </div>
 
+      {templates.length > 8 && (
+        <div className="relative mb-6 max-w-sm">
+          <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-300" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t.common.search}
+            className="w-full rounded-lg border border-ink-200 py-2 pl-9 pr-3 text-sm outline-none transition focus:border-ink-400"
+          />
+        </div>
+      )}
+
       <div className="mb-8">
         <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t.app.templates.chooseType}</p>
         <div className="flex gap-4 overflow-x-auto pb-2">
-          {templates.map((tpl) => (
+          {filtered.slice(0, 40).map((tpl) => (
             <FileThumb key={tpl.id} t={tpl} active={openId === tpl.id} onSelect={() => setOpenId(tpl.id)} />
           ))}
         </div>
       </div>
 
       <div className="space-y-4">
-        {templates.map((tpl) => {
+        {filtered.length === 0 && <p className="text-sm text-ink-400">{t.common.notFoundShort}</p>}
+        {filtered.map((tpl) => {
           const open = openId === tpl.id
-          const tplClauses = tpl.clauseIds.map((cid) => clauses.find((c) => c.id === cid)!).filter(Boolean)
+          const tplClauses = open ? tpl.clauseIds.map((cid) => clauses.find((c) => c.id === cid)!).filter(Boolean) : []
           return (
             <Card key={tpl.id} className="overflow-hidden">
               <button onClick={() => setOpenId(open ? null : tpl.id)} className="flex w-full items-center justify-between gap-4 p-5 text-left">
@@ -106,7 +127,7 @@ export default function Templates() {
                   </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
-                  <Badge tone="neutral"><ListChecks size={11} className="mr-1 inline" />{tplClauses.length}</Badge>
+                  <Badge tone="neutral"><ListChecks size={11} className="mr-1 inline" />{tpl.clauseIds.length}</Badge>
                   <ChevronDown size={18} className={`text-ink-400 transition-transform ${open ? 'rotate-180' : ''}`} />
                 </div>
               </button>

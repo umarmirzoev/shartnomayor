@@ -85,8 +85,8 @@ export default function ClientDetail() {
       <Modal open={open} onClose={() => setOpen(false)} title={t.app.clientDetail.newCaseModalTitle}>
         <NewCaseForm
           t={t}
-          onCreate={(title) => {
-            const item = addCase({ clientId: client.id, title, status: 'active' })
+          onCreate={async (title) => {
+            const item = await addCase({ clientId: client.id, title, status: 'active' })
             setOpen(false)
             navigate(`/app/cases/${item.id}`)
           }}

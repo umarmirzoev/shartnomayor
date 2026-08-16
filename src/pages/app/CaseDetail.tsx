@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, FileText, Sparkles, User2 } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
@@ -7,13 +6,12 @@ import { ButtonLink } from '@/components/ui/Button'
 import { useAppData } from '@/lib/store'
 import { caseStatusBadge, caseStatusLabel, statusBadge, statusLabel } from '@/lib/labels'
 import { useT } from '@/lib/i18n/context'
-import { localizeCaseTitle, localizeDraftTitle, localizedTemplates } from '@/lib/seedText'
+import { localizeCaseTitle, localizeDraftTitle } from '@/lib/seedText'
 
 export default function CaseDetail() {
   const t = useT()
   const { id } = useParams()
-  const { cases, clients, drafts } = useAppData()
-  const templates = useMemo(() => localizedTemplates(t), [t])
+  const { cases, clients, drafts, templates } = useAppData()
   const item = cases.find((c) => c.id === id)
   const client = clients.find((c) => c.id === item?.clientId)
   const caseDrafts = drafts.filter((d) => d.caseId === id)

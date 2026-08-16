@@ -6,14 +6,12 @@ import { ButtonLink } from '@/components/ui/Button'
 import { useAppData, useAuth } from '@/lib/store'
 import { statusBadge, statusLabel } from '@/lib/labels'
 import { useT } from '@/lib/i18n/context'
-import { localizedTemplates, localizeDraftTitle, localizeAlert } from '@/lib/seedText'
-import { useMemo } from 'react'
+import { localizeDraftTitle, localizeAlert } from '@/lib/seedText'
 
 export default function Dashboard() {
   const t = useT()
-  const { drafts, clients, cases, alerts, aiUsed, aiLimit } = useAppData()
+  const { drafts, clients, cases, alerts, templates, aiUsed, aiLimit } = useAppData()
   const { user } = useAuth()
-  const templates = useMemo(() => localizedTemplates(t), [t])
   const unreadAlerts = alerts.filter((a) => !a.read)
   const recentDrafts = [...drafts].sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1)).slice(0, 5)
   const usagePct = Math.round((aiUsed / aiLimit) * 100)

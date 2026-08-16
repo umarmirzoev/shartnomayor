@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { Bell, BellRing, Check } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
@@ -6,12 +5,11 @@ import { Button } from '@/components/ui/Button'
 import { useAppData } from '@/lib/store'
 import { severityBadge, severityLabel } from '@/lib/labels'
 import { useT } from '@/lib/i18n/context'
-import { localizedTemplates, localizeAlert } from '@/lib/seedText'
+import { localizeAlert } from '@/lib/seedText'
 
 export default function Alerts() {
   const t = useT()
-  const { alerts, markAlertRead } = useAppData()
-  const templates = useMemo(() => localizedTemplates(t), [t])
+  const { alerts, templates, markAlertRead } = useAppData()
   const sorted = [...alerts].sort((a, b) => (a.date < b.date ? 1 : -1))
 
   return (
