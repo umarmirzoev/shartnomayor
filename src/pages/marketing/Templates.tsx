@@ -76,7 +76,7 @@ export default function Templates() {
                   style={{ transitionDelay: `${i * 60}ms` }}
                 >
                   <button onClick={() => setOpenId(isOpen ? null : tpl.id)} className="flex w-full items-start gap-4 p-6 text-left">
-                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-ink-900 text-gold-500 transition-transform duration-300 group-hover:scale-105">
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-ink-900 text-gold-500 transition-transform duration-300 group-hover:scale-105 dark:bg-white dark:text-gold-600">
                       <Icon size={20} />
                     </span>
                     <div className="min-w-0 flex-1">
@@ -89,26 +89,26 @@ export default function Templates() {
                         <ListChecks size={13} /> {clauses.length} {t.templatesPage.clausesCount} · {tpl.fields.length} {t.templatesPage.fieldsCount}
                       </p>
                     </div>
-                    <ChevronDown size={18} className={clsx('mt-1 shrink-0 text-ink-400 transition-transform duration-300', isOpen && 'rotate-180')} />
+                    <ChevronDown size={18} className={clsx('mt-1 shrink-0 text-ink-400 transition-transform duration-300 dark:text-ink-500', isOpen && 'rotate-180')} />
                   </button>
 
                   <div className="grid overflow-hidden transition-all duration-300 ease-out" style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}>
                     <div className="min-h-0">
                       <div className="space-y-4 border-t border-ink-100 px-6 py-5 dark:border-white/10">
                         <div>
-                          <p className="text-xs font-semibold uppercase tracking-wide text-ink-400">{t.templatesPage.clausesTitle}</p>
+                          <p className="text-xs font-semibold uppercase tracking-wide text-ink-400 dark:text-ink-500">{t.templatesPage.clausesTitle}</p>
                           <ul className="mt-2 space-y-1.5">
                             {clauses.map((c) => (
                               <li key={c.id} className="flex items-center gap-2 text-sm text-ink-600 dark:text-ink-300">
                                 <span className={clsx('h-1.5 w-1.5 shrink-0 rounded-full', c.optional ? 'bg-ink-300 dark:bg-white/20' : 'bg-gold-500')} />
                                 {c.title}
-                                {c.optional && <span className="text-xs text-ink-400">· {t.templatesPage.optional}</span>}
+                                {c.optional && <span className="text-xs text-ink-400 dark:text-ink-500">· {t.templatesPage.optional}</span>}
                               </li>
                             ))}
                           </ul>
                         </div>
                         <div>
-                          <p className="text-xs font-semibold uppercase tracking-wide text-ink-400">{t.templatesPage.fieldsTitle}</p>
+                          <p className="text-xs font-semibold uppercase tracking-wide text-ink-400 dark:text-ink-500">{t.templatesPage.fieldsTitle}</p>
                           <div className="mt-2 flex flex-wrap gap-1.5">
                             {tpl.fields.map((f) => (
                               <span key={f.key} className="rounded-full bg-ink-50 px-2.5 py-1 text-xs text-ink-600 dark:bg-white/5 dark:text-ink-300">
@@ -151,7 +151,7 @@ export default function Templates() {
 
       <section ref={ctaRef} className="px-5 py-20 lg:px-8 lg:py-28">
         <Card className="reveal mx-auto max-w-5xl overflow-hidden p-10 text-center sm:p-14">
-          <CheckCircle2 className="mx-auto mb-5 text-emerald-500" size={30} />
+          <CheckCircle2 className="mx-auto mb-5 text-emerald-500 dark:text-emerald-400" size={30} />
           <h2 className="text-2xl font-bold text-ink-950 sm:text-3xl dark:text-white">{t.templatesPage.ctaTitle}</h2>
           <p className="mx-auto mt-4 max-w-lg text-ink-500 dark:text-ink-300">{t.templatesPage.ctaDesc}</p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">

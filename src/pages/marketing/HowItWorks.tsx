@@ -97,7 +97,7 @@ export default function HowItWorks() {
                   className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
                 >
                   <span className="text-sm font-semibold text-ink-900 dark:text-white">{item.q}</span>
-                  <ChevronDown size={18} className={`shrink-0 text-ink-400 transition-transform duration-300 ${openIdx === i ? 'rotate-180' : ''}`} />
+                  <ChevronDown size={18} className={`shrink-0 text-ink-400 transition-transform duration-300 dark:text-ink-500 ${openIdx === i ? 'rotate-180' : ''}`} />
                 </button>
                 <div
                   className="grid overflow-hidden transition-all duration-300 ease-out"

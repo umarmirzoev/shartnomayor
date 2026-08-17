@@ -105,8 +105,8 @@ export default function DraftNew() {
   return (
     <div className="mx-auto max-w-3xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-ink-950">{t.app.draftNew.title}</h1>
-        <p className="mt-1 text-sm text-ink-500">{t.app.draftNew.subtitle}</p>
+        <h1 className="text-2xl font-bold text-ink-950 dark:text-white">{t.app.draftNew.title}</h1>
+        <p className="mt-1 text-sm text-ink-500 dark:text-ink-400">{t.app.draftNew.subtitle}</p>
       </div>
 
       <Steps step={step} steps={steps} />
@@ -115,8 +115,8 @@ export default function DraftNew() {
         <Card className="mt-6 p-6">
           <div className="space-y-5">
             {cases.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-ink-200 bg-ink-50/60 p-5 text-center">
-                <p className="text-sm font-semibold text-ink-800">{t.app.draftNew.caseHint}</p>
+              <div className="rounded-xl border border-dashed border-ink-200 bg-ink-50/60 p-5 text-center dark:border-white/15 dark:bg-white/[0.03]">
+                <p className="text-sm font-semibold text-ink-800 dark:text-ink-200">{t.app.draftNew.caseHint}</p>
                 <Button className="mt-4" onClick={() => navigate('/app/clients')}>{t.app.draftNew.goToClients}</Button>
               </div>
             ) : (
@@ -131,21 +131,21 @@ export default function DraftNew() {
             )}
 
             <div>
-              <span className="mb-2 block text-sm font-semibold text-ink-800">{t.app.draftNew.contractType}</span>
+              <span className="mb-2 block text-sm font-semibold text-ink-800 dark:text-ink-200">{t.app.draftNew.contractType}</span>
               {templates.length > 8 && (
                 <div className="relative mb-3">
-                  <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-300" />
+                  <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-300 dark:text-ink-500" />
                   <input
                     value={templateQuery}
                     onChange={(e) => setTemplateQuery(e.target.value)}
                     placeholder={t.common.search}
-                    className="w-full rounded-lg border border-ink-200 py-2 pl-9 pr-3 text-sm outline-none transition focus:border-ink-400"
+                    className="w-full rounded-lg border border-ink-200 bg-white py-2 pl-9 pr-3 text-sm text-ink-900 outline-none transition focus:border-ink-400 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:placeholder:text-ink-500 dark:focus:border-ink-300"
                   />
                 </div>
               )}
               <div className="grid max-h-80 grid-cols-2 gap-3 overflow-y-auto pr-1">
                 {filteredTemplates.length === 0 && (
-                  <p className="col-span-2 text-sm text-ink-400">{t.common.notFoundShort}</p>
+                  <p className="col-span-2 text-sm text-ink-400 dark:text-ink-500">{t.common.notFoundShort}</p>
                 )}
                 {filteredTemplates.map((tpl) => {
                   const active = tpl.id === templateId
@@ -153,11 +153,11 @@ export default function DraftNew() {
                     <button
                       key={tpl.id}
                       onClick={() => setTemplateId(tpl.id)}
-                      className={`rounded-xl border p-4 text-left transition ${active ? 'border-ink-900 bg-ink-50 ring-1 ring-ink-900' : 'border-ink-200 hover:border-ink-400'}`}
+                      className={`rounded-xl border p-4 text-left transition-all duration-200 ${active ? 'border-ink-900 bg-ink-50 ring-1 ring-ink-900 dark:border-white dark:bg-white/10 dark:ring-white' : 'border-ink-200 hover:border-ink-400 hover:bg-ink-50/60 dark:border-white/10 dark:hover:border-white/30 dark:hover:bg-white/[0.04]'}`}
                     >
-                      <FileStack size={16} className={active ? 'text-gold-600' : 'text-ink-400'} />
-                      <p className="mt-2 text-sm font-bold text-ink-900">{tpl.title}</p>
-                      <p className="mt-0.5 text-xs text-ink-400">{tpl.category}</p>
+                      <FileStack size={16} className={active ? 'text-gold-600 dark:text-gold-400' : 'text-ink-400 dark:text-ink-500'} />
+                      <p className="mt-2 text-sm font-bold text-ink-900 dark:text-white">{tpl.title}</p>
+                      <p className="mt-0.5 text-xs text-ink-400 dark:text-ink-500">{tpl.category}</p>
                     </button>
                   )
                 })}
@@ -211,12 +211,12 @@ export default function DraftNew() {
             <Sparkles size={18} className="absolute -right-1 -top-1 text-ink-400" />
           </div>
           <div>
-            <p className="text-sm font-bold text-ink-900">{aiStages[stageIdx]}</p>
-            <p className="mt-1 text-xs text-ink-400">{t.app.draftNew.aiPort}</p>
+            <p className="text-sm font-bold text-ink-900 dark:text-white">{aiStages[stageIdx]}</p>
+            <p className="mt-1 text-xs text-ink-400 dark:text-ink-500">{t.app.draftNew.aiPort}</p>
           </div>
           <div className="flex gap-2">
             {aiStages.map((_, i) => (
-              <span key={i} className={`h-1.5 w-8 rounded-full transition ${i <= stageIdx ? 'bg-gold-500' : 'bg-ink-100'}`} />
+              <span key={i} className={`h-1.5 w-8 rounded-full transition ${i <= stageIdx ? 'bg-gold-500' : 'bg-ink-100 dark:bg-white/10'}`} />
             ))}
           </div>
         </Card>
@@ -225,15 +225,15 @@ export default function DraftNew() {
       {step === 3 && (
         <div className="mt-6">
           <Card className="p-6">
-            <div className="mb-4 flex items-center gap-2 text-emerald-600">
+            <div className="mb-4 flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
               <CheckCircle2 size={18} />
               <p className="text-sm font-bold">{t.app.draftNew.assembledFrom} {parseContent(generated).length} {t.app.draftNew.libraryClauses}</p>
             </div>
-            <div className="max-h-96 space-y-4 overflow-y-auto rounded-xl border border-ink-100 bg-ink-50/50 p-5">
+            <div className="max-h-96 space-y-4 overflow-y-auto rounded-xl border border-ink-100 bg-ink-50/50 p-5 dark:border-white/10 dark:bg-white/[0.02]">
               {parseContent(generated).map((b, i) => (
                 <div key={i}>
-                  <p className="text-sm font-bold text-ink-900">{i + 1}. {b.heading}</p>
-                  <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-ink-600">{b.body}</p>
+                  <p className="text-sm font-bold text-ink-900 dark:text-white">{i + 1}. {b.heading}</p>
+                  <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-ink-600 dark:text-ink-300">{b.body}</p>
                 </div>
               ))}
             </div>
@@ -255,15 +255,15 @@ function Steps({ step, steps }: { step: number; steps: readonly string[] }) {
         <div key={label} className="flex flex-1 items-center last:flex-none">
           <div className="flex flex-col items-center gap-1.5">
             <div
-              className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition ${
-                i < step ? 'bg-ink-900 text-white' : i === step ? 'bg-gold-500 text-ink-950' : 'bg-ink-100 text-ink-400'
+              className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-colors duration-200 ${
+                i < step ? 'bg-ink-900 text-white dark:bg-white dark:text-ink-950' : i === step ? 'bg-gold-500 text-ink-950' : 'bg-ink-100 text-ink-400 dark:bg-white/10 dark:text-ink-500'
               }`}
             >
               {i < step ? <Icons.Check size={14} /> : i + 1}
             </div>
-            <span className={`hidden text-[11px] font-medium sm:block ${i === step ? 'text-ink-900' : 'text-ink-400'}`}>{label}</span>
+            <span className={`hidden text-[11px] font-medium sm:block ${i === step ? 'text-ink-900 dark:text-white' : 'text-ink-400 dark:text-ink-500'}`}>{label}</span>
           </div>
-          {i < steps.length - 1 && <div className={`mx-2 h-px flex-1 ${i < step ? 'bg-ink-900' : 'bg-ink-100'}`} />}
+          {i < steps.length - 1 && <div className={`mx-2 h-px flex-1 ${i < step ? 'bg-ink-900 dark:bg-white' : 'bg-ink-100 dark:bg-white/10'}`} />}
         </div>
       ))}
     </div>

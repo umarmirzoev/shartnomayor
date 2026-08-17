@@ -21,13 +21,13 @@ function FileThumb({ t, active, onSelect }: { t: Template; active: boolean; onSe
   return (
     <button onClick={onSelect} className="group w-[152px] shrink-0 text-left" title={t.title}>
       <div
-        className={`relative aspect-[3/4] w-full overflow-hidden rounded-lg border bg-white shadow-card transition-all duration-200 group-hover:-translate-y-1 group-hover:border-gold-300 group-hover:shadow-soft ${
-          active ? 'border-ink-300' : 'border-ink-100'
+        className={`relative aspect-[3/4] w-full overflow-hidden rounded-lg border bg-white shadow-card transition-all duration-200 group-hover:-translate-y-1 group-hover:border-gold-300 group-hover:shadow-soft dark:bg-ink-900 dark:shadow-none dark:group-hover:border-gold-500/50 ${
+          active ? 'border-ink-300 dark:border-white/25' : 'border-ink-100 dark:border-white/10'
         }`}
       >
         {/* page-corner fold flourish */}
         <div
-          className="absolute right-0 top-0 h-4 w-4 bg-ink-50"
+          className="absolute right-0 top-0 h-4 w-4 bg-ink-50 dark:bg-white/10"
           style={{ clipPath: 'polygon(100% 0, 0 0, 100% 100%)' }}
         />
 
@@ -46,8 +46,8 @@ function FileThumb({ t, active, onSelect }: { t: Template; active: boolean; onSe
           <Section widths={['w-2/5', 'w-3/5']} />
         </div>
       </div>
-      <p className="mt-2 truncate text-xs font-semibold text-ink-800">{t.title}</p>
-      <p className="truncate text-[11px] text-ink-400">{t.category}</p>
+      <p className="mt-2 truncate text-xs font-semibold text-ink-800 dark:text-ink-200">{t.title}</p>
+      <p className="truncate text-[11px] text-ink-400 dark:text-ink-500">{t.category}</p>
     </button>
   )
 }
@@ -56,9 +56,9 @@ function Section({ widths }: { widths: string[] }) {
   const [headingW, ...bodyW] = widths
   return (
     <div className="space-y-1.5">
-      <div className={`h-1.5 ${headingW} rounded-full bg-ink-300`} />
+      <div className={`h-1.5 ${headingW} rounded-full bg-ink-300 dark:bg-white/20`} />
       {bodyW.map((w, i) => (
-        <div key={i} className={`h-1 ${w} rounded-full bg-ink-100`} />
+        <div key={i} className={`h-1 ${w} rounded-full bg-ink-100 dark:bg-white/10`} />
       ))}
     </div>
   )
@@ -82,26 +82,26 @@ export default function Templates() {
     <div className="max-w-4xl">
       <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <h1 className="text-2xl font-bold text-ink-950">{t.app.templates.title}</h1>
-          <p className="mt-1 text-sm text-ink-500">{t.app.templates.subtitle} · {templates.length}</p>
+          <h1 className="text-2xl font-bold text-ink-950 dark:text-white">{t.app.templates.title}</h1>
+          <p className="mt-1 text-sm text-ink-500 dark:text-ink-400">{t.app.templates.subtitle} · {templates.length}</p>
         </div>
         <ButtonLink to="/app/drafts/new" icon={<Sparkles size={16} />}>{t.app.templates.createDraft}</ButtonLink>
       </div>
 
       {templates.length > 8 && (
         <div className="relative mb-6 max-w-sm">
-          <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-300" />
+          <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-300 dark:text-ink-500" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t.common.search}
-            className="w-full rounded-lg border border-ink-200 py-2 pl-9 pr-3 text-sm outline-none transition focus:border-ink-400"
+            className="w-full rounded-lg border border-ink-200 bg-white py-2 pl-9 pr-3 text-sm text-ink-900 outline-none transition focus:border-ink-400 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:placeholder:text-ink-500 dark:focus:border-ink-300"
           />
         </div>
       )}
 
       <div className="mb-8">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t.app.templates.chooseType}</p>
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400 dark:text-ink-500">{t.app.templates.chooseType}</p>
         <div className="flex gap-4 overflow-x-auto pb-2">
           {filtered.slice(0, 40).map((tpl) => (
             <FileThumb
@@ -118,7 +118,7 @@ export default function Templates() {
       </div>
 
       <div className="space-y-4">
-        {filtered.length === 0 && <p className="text-sm text-ink-400">{t.common.notFoundShort}</p>}
+        {filtered.length === 0 && <p className="text-sm text-ink-400 dark:text-ink-500">{t.common.notFoundShort}</p>}
         {filtered.map((tpl) => {
           const open = openId === tpl.id
           const tplClauses = open ? tpl.clauseIds.map((cid) => clauses.find((c) => c.id === cid)!).filter(Boolean) : []
@@ -130,24 +130,24 @@ export default function Templates() {
                   setOpenId(next)
                   if (next) void ensureTemplateClauses(next)
                 }}
-                className="flex w-full items-center justify-between gap-4 p-5 text-left"
+                className="flex w-full items-center justify-between gap-4 p-5 text-left transition-colors duration-200 hover:bg-ink-50/60 dark:hover:bg-white/[0.03]"
               >
                 <div className="flex items-center gap-3.5">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-ink-900 text-gold-500">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-ink-900 text-gold-500 dark:bg-white dark:text-gold-600">
                     <FileStack size={18} />
                   </span>
                   <div>
-                    <p className="text-[15px] font-bold text-ink-900">{tpl.title}</p>
-                    <p className="mt-0.5 text-xs text-ink-400">{tpl.description}</p>
+                    <p className="text-[15px] font-bold text-ink-900 dark:text-white">{tpl.title}</p>
+                    <p className="mt-0.5 text-xs text-ink-400 dark:text-ink-500">{tpl.description}</p>
                   </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
                   <Badge tone="neutral"><ListChecks size={11} className="mr-1 inline" />{tpl.clauseIds.length}</Badge>
-                  <ChevronDown size={18} className={`text-ink-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+                  <ChevronDown size={18} className={`text-ink-400 transition-transform duration-200 dark:text-ink-500 ${open ? 'rotate-180' : ''}`} />
                 </div>
               </button>
               {open && (
-                <div className="border-t border-ink-100 bg-ink-50/40 p-5">
+                <div className="border-t border-ink-100 bg-ink-50/40 p-5 dark:border-white/10 dark:bg-white/[0.02]">
                   <div className="mb-4 flex flex-wrap gap-1.5">
                     {tpl.fields.map((f) => (
                       <Badge key={f.key} tone="gold">{f.label}</Badge>
@@ -155,12 +155,12 @@ export default function Templates() {
                   </div>
                   <div className="space-y-3">
                     {tplClauses.map((c) => (
-                      <div key={c.id} className="rounded-xl border border-ink-100 bg-white p-4">
+                      <div key={c.id} className="rounded-xl border border-ink-100 bg-white p-4 dark:border-white/10 dark:bg-ink-900">
                         <div className="flex items-center justify-between gap-3">
-                          <p className="text-sm font-bold text-ink-900">{c.title}</p>
+                          <p className="text-sm font-bold text-ink-900 dark:text-white">{c.title}</p>
                           {c.optional && <Badge tone="amber">{t.app.templates.optional}</Badge>}
                         </div>
-                        <p className="mt-1.5 text-xs leading-relaxed text-ink-500">{fillClausePreview(c.body, tpl.fields)}</p>
+                        <p className="mt-1.5 text-xs leading-relaxed text-ink-500 dark:text-ink-400">{fillClausePreview(c.body, tpl.fields)}</p>
                       </div>
                     ))}
                   </div>

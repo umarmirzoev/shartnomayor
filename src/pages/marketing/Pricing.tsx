@@ -51,9 +51,9 @@ export default function Pricing() {
                 <h3 className="text-lg font-bold text-ink-900 dark:text-white">{p.name}</h3>
                 <p className="mt-1 flex items-baseline gap-1.5">
                   <span className="text-3xl font-extrabold text-ink-950 dark:text-white">{p.price}</span>
-                  {p.showUnit && <span className="text-sm text-ink-400">/ {t.pricingPage.perMonth}</span>}
+                  {p.showUnit && <span className="text-sm text-ink-400 dark:text-ink-500">/ {t.pricingPage.perMonth}</span>}
                 </p>
-                <p className="mt-2 text-sm text-ink-400">{p.desc}</p>
+                <p className="mt-2 text-sm text-ink-400 dark:text-ink-500">{p.desc}</p>
                 <ul className="mt-6 space-y-2.5">
                   {p.features.map((f) => (
                     <li key={f} className="flex items-start gap-2.5 text-sm text-ink-600 dark:text-ink-300">
@@ -67,8 +67,8 @@ export default function Pricing() {
               </Card>
             ))}
           </div>
-          <p className="reveal mt-6 flex items-center justify-center gap-2 text-center text-xs text-ink-400">
-            <Sparkles size={13} className="text-gold-500" /> {t.pricingPage.freeAiNote}
+          <p className="reveal mt-6 flex items-center justify-center gap-2 text-center text-xs text-ink-400 dark:text-ink-500">
+            <Sparkles size={13} className="text-gold-500 dark:text-gold-400" /> {t.pricingPage.freeAiNote}
           </p>
         </div>
       </section>
@@ -115,9 +115,9 @@ export default function Pricing() {
           <div className="mt-10 divide-y divide-ink-100 rounded-2xl border border-ink-100 dark:divide-white/10 dark:border-white/10">
             {t.pricingPage.billingFaq.map((item, i) => (
               <div key={item.q} className="reveal" style={{ transitionDelay: `${i * 50}ms` }}>
-                <button onClick={() => setOpenIdx(openIdx === i ? null : i)} className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left">
+                <button onClick={() => setOpenIdx(openIdx === i ? null : i)} className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors duration-200 hover:bg-ink-50/60 dark:hover:bg-white/[0.03]">
                   <span className="text-sm font-semibold text-ink-900 dark:text-white">{item.q}</span>
-                  <ChevronDown size={18} className={clsx('shrink-0 text-ink-400 transition-transform duration-300', openIdx === i && 'rotate-180')} />
+                  <ChevronDown size={18} className={clsx('shrink-0 text-ink-400 transition-transform duration-300 dark:text-ink-500', openIdx === i && 'rotate-180')} />
                 </button>
                 <div className="grid overflow-hidden transition-all duration-300 ease-out" style={{ gridTemplateRows: openIdx === i ? '1fr' : '0fr' }}>
                   <div className="min-h-0">

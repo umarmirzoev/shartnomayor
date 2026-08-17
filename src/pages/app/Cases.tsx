@@ -28,13 +28,13 @@ export default function Cases() {
   return (
     <div className="max-w-6xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-ink-950">{t.app.cases.title}</h1>
-        <p className="mt-1 text-sm text-ink-500">{cases.length} {t.app.cases.countTotal}, {cases.filter((c) => c.status === 'active').length} {t.app.cases.countActive}</p>
+        <h1 className="text-2xl font-bold text-ink-950 dark:text-white">{t.app.cases.title}</h1>
+        <p className="mt-1 text-sm text-ink-500 dark:text-ink-400">{cases.length} {t.app.cases.countTotal}, {cases.filter((c) => c.status === 'active').length} {t.app.cases.countActive}</p>
       </div>
 
       <div className="mb-5 flex flex-col gap-3 sm:flex-row">
         <div className="relative max-w-sm flex-1">
-          <Search size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-300" />
+          <Search size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-300 dark:text-ink-500" />
           <Input className="pl-10" placeholder={t.app.cases.searchPlaceholder} value={query} onChange={(e) => setQuery(e.target.value)} />
         </div>
         <Select className="max-w-[180px]" value={status} onChange={(e) => setStatus(e.target.value)}>
@@ -51,25 +51,25 @@ export default function Cases() {
           const docsCount = drafts.filter((d) => d.caseId === c.id).length
           return (
             <Link key={c.id} to={`/app/cases/${c.id}`}>
-              <Card className="flex flex-col justify-between gap-3 p-5 transition hover:-translate-y-0.5 hover:shadow-soft sm:flex-row sm:items-center">
+              <Card className="group flex flex-col justify-between gap-3 p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-soft sm:flex-row sm:items-center">
                 <div className="flex items-start gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ink-100 text-ink-500">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ink-100 text-ink-500 dark:bg-white/10 dark:text-ink-300">
                     <Briefcase size={17} />
                   </span>
                   <div>
-                    <p className="text-sm font-bold text-ink-900">{localizeCaseTitle(c, t)}</p>
-                    <p className="mt-0.5 text-xs text-ink-400">{client?.name} · {docsCount} {t.app.cases.docsCount} · {t.app.cases.openedAt} {c.createdAt}</p>
+                    <p className="text-sm font-bold text-ink-900 dark:text-white">{localizeCaseTitle(c, t)}</p>
+                    <p className="mt-0.5 text-xs text-ink-400 dark:text-ink-500">{client?.name} · {docsCount} {t.app.cases.docsCount} · {t.app.cases.openedAt} {c.createdAt}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <Badge tone={caseStatusBadge(c.status)}>{caseStatusLabel(c.status, t)}</Badge>
-                  <ArrowUpRight size={15} className="text-ink-300" />
+                  <ArrowUpRight size={15} className="text-ink-300 transition-transform duration-200 group-hover:translate-x-0.5 dark:text-ink-500" />
                 </div>
               </Card>
             </Link>
           )
         })}
-        {filtered.length === 0 && <p className="text-sm text-ink-400">{t.common.notFoundShort}</p>}
+        {filtered.length === 0 && <p className="text-sm text-ink-400 dark:text-ink-500">{t.common.notFoundShort}</p>}
       </div>
     </div>
   )

@@ -55,7 +55,7 @@ export default function Features() {
                     style={{ transitionDelay: `${(gi * 3 + i) * 60}ms` }}
                   >
                     <span className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-gold-100 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-70 dark:bg-gold-500/20" />
-                    <span className="relative mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-ink-900 text-gold-500 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                    <span className="relative mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-ink-900 text-gold-500 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 dark:bg-white dark:text-gold-600">
                       <Icon size={20} />
                     </span>
                     <h3 className="relative text-base font-semibold text-ink-900 dark:text-white">{f.title}</h3>
@@ -105,7 +105,7 @@ export default function Features() {
           </div>
           <div className="mt-12 grid grid-cols-1 gap-5">
             {t.featuresPage.compare.map((row, i) => (
-              <div key={row.without} className="reveal grid grid-cols-1 gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition hover:border-white/20 sm:grid-cols-2" style={{ transitionDelay: `${i * 70}ms` }}>
+              <div key={row.without} className="reveal grid grid-cols-1 gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition-colors duration-200 hover:border-white/20 sm:grid-cols-2" style={{ transitionDelay: `${i * 70}ms` }}>
                 <div className="flex items-start gap-2.5 text-sm text-ink-300">
                   <XCircle size={17} className="mt-0.5 shrink-0 text-red-400" /> {row.without}
                 </div>
@@ -120,7 +120,7 @@ export default function Features() {
 
       <section ref={ctaRef} className="px-5 py-20 lg:px-8 lg:py-28">
         <Card className="reveal mx-auto max-w-5xl overflow-hidden p-10 text-center sm:p-14">
-          <Scale className="mx-auto mb-5 text-gold-500" size={30} />
+          <Scale className="mx-auto mb-5 text-gold-500 dark:text-gold-400" size={30} />
           <h2 className="text-2xl font-bold text-ink-950 sm:text-3xl dark:text-white">{t.featuresPage.ctaTitle}</h2>
           <p className="mx-auto mt-4 max-w-lg text-ink-500 dark:text-ink-300">
             {t.featuresPage.ctaDesc}

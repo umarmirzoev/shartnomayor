@@ -39,7 +39,7 @@ export default function DraftEditor() {
   const [viewingVersionId, setViewingVersionId] = useState<string | null>(null)
   const [exporting, setExporting] = useState(false)
 
-  if (!draft) return <p className="text-sm text-ink-500">{t.app.draftEditor.notFound} <Link to="/app/cases" className="underline">{t.app.draftEditor.back}</Link></p>
+  if (!draft) return <p className="text-sm text-ink-500 dark:text-ink-400">{t.app.draftEditor.notFound} <Link to="/app/cases" className="underline">{t.app.draftEditor.back}</Link></p>
 
   const relatedCase = cases.find((c) => c.id === draft.caseId)
   const client = clients.find((c) => c.id === relatedCase?.clientId)
@@ -87,17 +87,17 @@ export default function DraftEditor() {
 
   return (
     <div className="mx-auto max-w-6xl">
-      <Link to={`/app/cases/${draft.caseId}`} className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-ink-500 hover:text-ink-900 no-print">
+      <Link to={`/app/cases/${draft.caseId}`} className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-ink-500 transition-colors duration-200 hover:text-ink-900 no-print dark:text-ink-400 dark:hover:text-white">
         <ArrowLeft size={15} /> {caseTitle}
       </Link>
 
       <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-start no-print">
         <div>
           <div className="flex flex-wrap items-center gap-2.5">
-            <h1 className="text-2xl font-bold text-ink-950">{draftTitle}</h1>
+            <h1 className="text-2xl font-bold text-ink-950 dark:text-white">{draftTitle}</h1>
             <Badge tone={statusBadge(draft.status)}>{statusLabel(draft.status, t)}</Badge>
           </div>
-          <p className="mt-1 text-sm text-ink-500">{template?.title} · {client?.name} · {t.app.draftEditor.version} {displayedVersion?.number}{!isLatest && ` ${t.app.draftEditor.historyView}`}</p>
+          <p className="mt-1 text-sm text-ink-500 dark:text-ink-400">{template?.title} · {client?.name} · {t.app.draftEditor.version} {displayedVersion?.number}{!isLatest && ` ${t.app.draftEditor.historyView}`}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link to="/app/drafts/new">
@@ -121,7 +121,7 @@ export default function DraftEditor() {
                 onChange={(e) => setDraftText(e.target.value)}
                 className="font-mono text-[13px] leading-relaxed"
               />
-              <p className="mt-2 text-xs text-ink-400">{t.app.draftEditor.editHint}</p>
+              <p className="mt-2 text-xs text-ink-400 dark:text-ink-500">{t.app.draftEditor.editHint}</p>
             </Card>
           ) : (
             <Card className="p-8 sm:p-10" id="print-area">
@@ -130,13 +130,13 @@ export default function DraftEditor() {
                 <p className="text-sm text-ink-500">{cityLine[lang]}, {new Date().toLocaleDateString('ru-RU')}</p>
               </div>
               <DocumentView content={displayedVersion?.content || ''} />
-              <div className="mt-14 grid grid-cols-2 gap-8 text-sm text-ink-500">
+              <div className="mt-14 grid grid-cols-2 gap-8 text-sm text-ink-500 dark:text-ink-400">
                 <div>
-                  <div className="mb-2 h-px w-40 bg-ink-300" />
+                  <div className="mb-2 h-px w-40 bg-ink-300 dark:bg-white/15" />
                   {t.app.draftEditor.signature1}
                 </div>
                 <div>
-                  <div className="mb-2 h-px w-40 bg-ink-300" />
+                  <div className="mb-2 h-px w-40 bg-ink-300 dark:bg-white/15" />
                   {t.app.draftEditor.signature2}
                 </div>
               </div>
@@ -146,12 +146,12 @@ export default function DraftEditor() {
 
         <div className="space-y-5 no-print">
           <Card className="p-5">
-            <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-ink-900"><ShieldAlert size={16} className="text-gold-600" /> {t.app.draftEditor.beforeExport}</h3>
+            <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-ink-900 dark:text-white"><ShieldAlert size={16} className="text-gold-600 dark:text-gold-400" /> {t.app.draftEditor.beforeExport}</h3>
             <button
               onClick={() => updateDraft(draft.id, { responsibilityConfirmed: !draft.responsibilityConfirmed })}
-              className="flex items-start gap-2.5 rounded-xl border border-ink-100 bg-ink-50/60 p-3.5 text-left text-xs leading-relaxed text-ink-600 transition hover:border-ink-300"
+              className="flex items-start gap-2.5 rounded-xl border border-ink-100 bg-ink-50/60 p-3.5 text-left text-xs leading-relaxed text-ink-600 transition-colors duration-200 hover:border-ink-300 dark:border-white/10 dark:bg-white/[0.03] dark:text-ink-300 dark:hover:border-white/25"
             >
-              {draft.responsibilityConfirmed ? <CheckSquare size={17} className="mt-0.5 shrink-0 text-emerald-600" /> : <Square size={17} className="mt-0.5 shrink-0 text-ink-300" />}
+              {draft.responsibilityConfirmed ? <CheckSquare size={17} className="mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400" /> : <Square size={17} className="mt-0.5 shrink-0 text-ink-300 dark:text-ink-500" />}
               {t.app.draftEditor.confirmText}
             </button>
             <div className="mt-4 space-y-2">
@@ -175,26 +175,26 @@ export default function DraftEditor() {
                 {t.app.draftEditor.exportPdf}
               </Button>
             </div>
-            {!draft.responsibilityConfirmed && <p className="mt-2 text-[11px] text-ink-400">{t.app.draftEditor.confirmHint}</p>}
+            {!draft.responsibilityConfirmed && <p className="mt-2 text-[11px] text-ink-400 dark:text-ink-500">{t.app.draftEditor.confirmHint}</p>}
           </Card>
 
           <Card className="p-5">
-            <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-ink-900"><History size={16} /> {t.app.draftEditor.versionHistory}</h3>
+            <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-ink-900 dark:text-white"><History size={16} /> {t.app.draftEditor.versionHistory}</h3>
             <div className="space-y-2">
               {[...draftVersions].reverse().map((v) => (
                 <button
                   key={v.id}
                   onClick={() => setViewingVersionId(v.id === currentVersion?.id ? null : v.id)}
-                  className={`w-full rounded-xl border p-3 text-left text-xs transition ${
-                    displayedVersion?.id === v.id ? 'border-ink-900 bg-ink-50' : 'border-ink-100 hover:border-ink-300'
+                  className={`w-full rounded-xl border p-3 text-left text-xs transition-colors duration-200 ${
+                    displayedVersion?.id === v.id ? 'border-ink-900 bg-ink-50 dark:border-white/30 dark:bg-white/10' : 'border-ink-100 hover:border-ink-300 dark:border-white/10 dark:hover:border-white/25'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-ink-900">{t.app.draftEditor.versionLabel} {v.number}</span>
-                    {v.author === 'ИИ-ассистент' ? <Sparkles size={12} className="text-gold-500" /> : null}
+                    <span className="font-bold text-ink-900 dark:text-white">{t.app.draftEditor.versionLabel} {v.number}</span>
+                    {v.author === 'ИИ-ассистент' ? <Sparkles size={12} className="text-gold-500 dark:text-gold-400" /> : null}
                   </div>
-                  <p className="mt-1 text-ink-500">{localizeVersionNote(v, t)}</p>
-                  <p className="mt-1 text-[10px] text-ink-400">{v.author === 'ИИ-ассистент' ? t.audit.aiAssistant : v.author} · {v.createdAt}</p>
+                  <p className="mt-1 text-ink-500 dark:text-ink-400">{localizeVersionNote(v, t)}</p>
+                  <p className="mt-1 text-[10px] text-ink-400 dark:text-ink-500">{v.author === 'ИИ-ассистент' ? t.audit.aiAssistant : v.author} · {v.createdAt}</p>
                 </button>
               ))}
             </div>
@@ -216,8 +216,8 @@ function DocumentView({ content }: { content: string }) {
         const body = isHeading ? lines.slice(1).join('\n') : chunk
         return (
           <div key={i}>
-            {heading && <p className="mb-1.5 text-[15px] font-bold text-ink-900">{i + 1}. {heading}</p>}
-            <p className="whitespace-pre-line text-[14px] leading-[1.75] text-ink-700 text-justify">{body}</p>
+            {heading && <p className="mb-1.5 text-[15px] font-bold text-ink-900 dark:text-white">{i + 1}. {heading}</p>}
+            <p className="whitespace-pre-line text-[14px] leading-[1.75] text-ink-700 text-justify dark:text-ink-300">{body}</p>
           </div>
         )
       })}

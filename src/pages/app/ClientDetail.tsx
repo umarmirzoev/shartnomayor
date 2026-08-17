@@ -23,29 +23,29 @@ export default function ClientDetail() {
   const clientCases = cases.filter((c) => c.clientId === id)
 
   if (!client) {
-    return <p className="text-sm text-ink-500">{t.app.clientDetail.notFound} <Link to="/app/clients" className="underline">{t.app.clientDetail.backToList}</Link></p>
+    return <p className="text-sm text-ink-500 dark:text-ink-400">{t.app.clientDetail.notFound} <Link to="/app/clients" className="underline">{t.app.clientDetail.backToList}</Link></p>
   }
 
   const note = localizeClientNote(client, t)
 
   return (
     <div className="max-w-4xl">
-      <Link to="/app/clients" className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-ink-500 hover:text-ink-900">
+      <Link to="/app/clients" className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-ink-500 transition-colors duration-200 hover:text-ink-900 dark:text-ink-400 dark:hover:text-white">
         <ArrowLeft size={15} /> {t.app.clientDetail.backLink}
       </Link>
 
       <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
         <div className="flex items-start gap-4">
-          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-ink-900 text-gold-500">
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-ink-900 text-gold-500 dark:bg-white dark:text-gold-600">
             {client.type === 'company' ? <Building2 size={24} /> : <User size={24} />}
           </span>
           <div>
-            <h1 className="text-2xl font-bold text-ink-950">{client.name}</h1>
-            <p className="mt-1 flex items-center gap-1.5 text-sm text-ink-500"><Phone size={13} /> {client.contact}</p>
+            <h1 className="text-2xl font-bold text-ink-950 dark:text-white">{client.name}</h1>
+            <p className="mt-1 flex items-center gap-1.5 text-sm text-ink-500 dark:text-ink-400"><Phone size={13} /> {client.contact}</p>
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <Badge tone="neutral">{client.type === 'company' ? t.app.clientDetail.legalEntity : t.app.clientDetail.individual}</Badge>
               <Badge tone={clientStatusBadge(client.status)}>{clientStatusLabel(client.status, t)}</Badge>
-              <span className="text-xs text-ink-400">{t.app.clientDetail.clientSince} {client.createdAt}</span>
+              <span className="text-xs text-ink-400 dark:text-ink-500">{t.app.clientDetail.clientSince} {client.createdAt}</span>
             </div>
           </div>
         </div>
@@ -64,22 +64,22 @@ export default function ClientDetail() {
       </div>
 
       {note && (
-        <Card className="mb-6 p-5 text-sm text-ink-600">{note}</Card>
+        <Card className="mb-6 p-5 text-sm text-ink-600 dark:text-ink-300">{note}</Card>
       )}
 
-      <h2 className="mb-3 text-sm font-bold text-ink-900">{t.app.clientDetail.casesTitle} ({clientCases.length})</h2>
+      <h2 className="mb-3 text-sm font-bold text-ink-900 dark:text-white">{t.app.clientDetail.casesTitle} ({clientCases.length})</h2>
       <div className="space-y-3">
         {clientCases.map((c) => (
           <Link key={c.id} to={`/app/cases/${c.id}`}>
-            <Card className="flex items-center justify-between p-4 transition hover:-translate-y-0.5 hover:shadow-soft">
-              <span className="flex items-center gap-3 text-sm font-semibold text-ink-900">
-                <Briefcase size={16} className="text-ink-400" /> {localizeCaseTitle(c, t)}
+            <Card className="flex items-center justify-between p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-soft">
+              <span className="flex items-center gap-3 text-sm font-semibold text-ink-900 dark:text-white">
+                <Briefcase size={16} className="text-ink-400 dark:text-ink-500" /> {localizeCaseTitle(c, t)}
               </span>
               <Badge tone={caseStatusBadge(c.status)}>{caseStatusLabel(c.status, t)}</Badge>
             </Card>
           </Link>
         ))}
-        {clientCases.length === 0 && <p className="text-sm text-ink-400">{t.app.clientDetail.noCases}</p>}
+        {clientCases.length === 0 && <p className="text-sm text-ink-400 dark:text-ink-500">{t.app.clientDetail.noCases}</p>}
       </div>
 
       <Modal open={open} onClose={() => setOpen(false)} title={t.app.clientDetail.newCaseModalTitle}>

@@ -38,7 +38,7 @@ function Hero() {
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[600px] bg-[radial-gradient(60%_50%_at_50%_0%,rgba(212,169,76,0.14),transparent)]" />
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-14 px-5 lg:grid-cols-2 lg:gap-10 lg:px-8">
         <div>
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-gold-300 bg-gold-100 px-3.5 py-1.5 text-xs font-semibold text-gold-700">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-gold-300 bg-gold-100 px-3.5 py-1.5 text-xs font-semibold text-gold-700 dark:border-gold-500/30 dark:bg-gold-500/10 dark:text-gold-400">
             <Sparkles size={13} /> {t.landing.hero.eyebrow}
           </div>
           <h1 className="text-[2.5rem] font-extrabold leading-[1.08] tracking-tight text-ink-950 sm:text-5xl lg:text-[3.4rem] dark:text-white">
@@ -137,7 +137,7 @@ function Features() {
             return (
               <div
                 key={f.title}
-                className="reveal rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-gold-500/40 hover:bg-white/[0.06]"
+                className="reveal rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition-all duration-200 hover:-translate-y-0.5 hover:border-gold-500/40 hover:bg-white/[0.06]"
                 style={{ transitionDelay: `${i * 60}ms` }}
               >
                 <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-gold-500/15 text-gold-400">
@@ -200,12 +200,12 @@ function TemplateLibrary() {
           {t.landing.templateLibrary.items.map((tpl, i) => {
             const Icon = templateIcons[i]
             return (
-              <Card key={tpl.title} className="reveal p-6 transition hover:-translate-y-1 hover:shadow-soft" style={{ transitionDelay: `${i * 70}ms` }}>
-                <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-ink-900 text-gold-500">
+              <Card key={tpl.title} className="reveal p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-soft" style={{ transitionDelay: `${i * 70}ms` }}>
+                <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-ink-900 text-gold-500 dark:bg-white dark:text-gold-600">
                   <Icon size={19} />
                 </span>
                 <h3 className="text-[15px] font-bold text-ink-900 dark:text-white">{tpl.title}</h3>
-                <p className="mt-1 text-xs text-ink-400">{tpl.tag}</p>
+                <p className="mt-1 text-xs text-ink-400 dark:text-ink-500">{tpl.tag}</p>
                 <p className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-ink-500 dark:text-ink-300">
                   <ListChecks size={13} /> {tpl.clauses} {t.landing.templateLibrary.clausesCount}
                 </p>
@@ -213,7 +213,7 @@ function TemplateLibrary() {
             )
           })}
         </div>
-        <p className="reveal mt-6 text-xs text-ink-400">
+        <p className="reveal mt-6 text-xs text-ink-400 dark:text-ink-500">
           {t.landing.templateLibrary.excludedNote}
         </p>
       </div>
@@ -277,8 +277,8 @@ function Security() {
           {t.landing.security.items.map((p, i) => {
             const Icon = securityIcons[i]
             return (
-              <Card key={p.title} className="reveal p-6" style={{ transitionDelay: `${i * 70}ms` }}>
-                <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-ink-900 text-gold-500">
+              <Card key={p.title} className="reveal p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-soft" style={{ transitionDelay: `${i * 70}ms` }}>
+                <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-ink-900 text-gold-500 dark:bg-white dark:text-gold-600">
                   <Icon size={18} />
                 </span>
                 <h3 className="text-sm font-bold text-ink-900 dark:text-white">{p.title}</h3>
@@ -317,7 +317,7 @@ function Pricing() {
               {p.highlighted && <Badge tone="gold" className="mb-4">{t.landing.pricing.recommended}</Badge>}
               <h3 className="text-lg font-bold text-ink-900 dark:text-white">{p.name}</h3>
               <p className="mt-1 text-3xl font-extrabold text-ink-950 dark:text-white">{p.price}</p>
-              <p className="mt-2 text-sm text-ink-400">{p.desc}</p>
+              <p className="mt-2 text-sm text-ink-400 dark:text-ink-500">{p.desc}</p>
               <ul className="mt-6 space-y-2.5">
                 {p.features.map((f) => (
                   <li key={f} className="flex items-start gap-2.5 text-sm text-ink-600 dark:text-ink-300">
@@ -355,7 +355,7 @@ function Faq() {
                 className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
               >
                 <span className="text-sm font-semibold text-ink-900 dark:text-white">{item.q}</span>
-                <ChevronDown size={18} className={`shrink-0 text-ink-400 transition-transform ${openIdx === i ? 'rotate-180' : ''}`} />
+                <ChevronDown size={18} className={`shrink-0 text-ink-400 transition-transform duration-200 dark:text-ink-500 ${openIdx === i ? 'rotate-180' : ''}`} />
               </button>
               {openIdx === i && (
                 <div className="px-6 pb-5 text-sm leading-relaxed text-ink-500 dark:text-ink-300">{item.a}</div>

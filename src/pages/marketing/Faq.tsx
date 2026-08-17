@@ -38,7 +38,7 @@ export default function Faq() {
         description={`${totalCount} ${t.faqPage.subtitle}`}
       >
         <div className="relative w-full max-w-md">
-          <Search size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-400" />
+          <Search size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-400 dark:text-ink-500" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -51,7 +51,7 @@ export default function Faq() {
       <section ref={listRef} className="pb-20 lg:pb-28">
         <div className="mx-auto max-w-3xl px-5 lg:px-8">
           {filtered.length === 0 && (
-            <p className="reveal py-16 text-center text-sm text-ink-400">{t.faqPage.notFound} «{query}». {t.faqPage.tryOther}</p>
+            <p className="reveal py-16 text-center text-sm text-ink-400 dark:text-ink-500">{t.faqPage.notFound} «{query}». {t.faqPage.tryOther}</p>
           )}
           <div className="space-y-10">
             {filtered.map((group, gi) => (
@@ -68,7 +68,7 @@ export default function Faq() {
                           className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors duration-200 hover:bg-ink-50/60 dark:hover:bg-white/[0.03]"
                         >
                           <span className="text-sm font-semibold text-ink-900 dark:text-white">{item.q}</span>
-                          <ChevronDown size={18} className={clsx('shrink-0 text-ink-400 transition-transform duration-300', isOpen && 'rotate-180')} />
+                          <ChevronDown size={18} className={clsx('shrink-0 text-ink-400 transition-transform duration-300 dark:text-ink-500', isOpen && 'rotate-180')} />
                         </button>
                         <div className="grid overflow-hidden transition-all duration-300 ease-out" style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}>
                           <div className="min-h-0">

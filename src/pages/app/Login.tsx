@@ -73,8 +73,8 @@ export default function Login() {
           <div className="mb-8 lg:hidden">
             <Logo />
           </div>
-          <h1 className="text-2xl font-bold text-ink-950">{isRegister ? t.app.login.createAccount : t.app.login.signIn}</h1>
-          <p className="mt-1.5 text-sm text-ink-500">
+          <h1 className="text-2xl font-bold text-ink-950 dark:text-white">{isRegister ? t.app.login.createAccount : t.app.login.signIn}</h1>
+          <p className="mt-1.5 text-sm text-ink-500 dark:text-ink-400">
             {isRegister ? t.app.login.registerNote : t.app.login.loginNote}
           </p>
 
@@ -82,26 +82,26 @@ export default function Login() {
             {isRegister && (
               <Field label={t.app.login.fullName}>
                 <div className="relative">
-                  <User2 size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-300" />
+                  <User2 size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-300 dark:text-ink-500" />
                   <Input className="pl-10" value={name} onChange={(e) => setName(e.target.value)} placeholder="Фарход Расулов" required />
                 </div>
               </Field>
             )}
             <Field label={t.app.login.email}>
               <div className="relative">
-                <Mail size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-300" />
+                <Mail size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-300 dark:text-ink-500" />
                 <Input className="pl-10" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@firm.tj" required />
               </div>
             </Field>
             <Field label={t.app.login.password}>
               <div className="relative">
-                <Lock size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-300" />
+                <Lock size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-300 dark:text-ink-500" />
                 <Input className="pl-10" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
               </div>
             </Field>
 
             {error && (
-              <p className="rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-xs text-red-600">{error}</p>
+              <p className="rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-xs text-red-600 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400">{error}</p>
             )}
 
             <Button type="submit" className="mt-2 w-full" size="lg" disabled={loading} iconRight={<ArrowRight size={17} />}>
@@ -109,10 +109,10 @@ export default function Login() {
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-ink-500">
+          <p className="mt-6 text-center text-sm text-ink-500 dark:text-ink-400">
             {isRegister ? t.app.login.hasAccount : t.app.login.noAccount}{' '}
             <button
-              className="font-semibold text-ink-900 underline decoration-gold-400 decoration-2 underline-offset-2"
+              className="font-semibold text-ink-900 underline decoration-gold-400 decoration-2 underline-offset-2 dark:text-white"
               onClick={() => setParams(isRegister ? {} : { mode: 'register' })}
             >
               {isRegister ? t.common.login : t.common.register}
