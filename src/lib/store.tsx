@@ -136,8 +136,14 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     const first = await api.templates.list({ pageSize: 100, pageNumber: 1 })
     const items = [...first.items]
     for (let page = 2; page <= first.totalPages; page++) {
-      const next = await api.templates.list({ pageSize: 100, pageNumber: page })
-      items.push(...next.items)
+      // Один медленный ответ хостинга не должен обнулять уже полученные страницы —
+      // отдаём то, что успели собрать, вместо падения всей загрузки библиотеки.
+      try {
+        const next = await api.templates.list({ pageSize: 100, pageNumber: page })
+        items.push(...next.items)
+      } catch {
+        break
+      }
     }
     return { ...first, items }
   }
@@ -149,7 +155,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       const [profile, clientsPage, templatesPage, aiUsage] = await Promise.all([
         api.auth.me(),
         api.clients.list({ pageSize: 100 }),
-        fetchAllTemplates(),
+        fetchAllTemplates().catch(() => ({ items: [] as never[] })),
         api.aiUsage.get().catch(() => null),
       ])
       setRealLawyer(adaptLawyer(profile))
@@ -180,7 +186,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
 
       const templatesWithClauses = await mapWithConcurrency(
         templatesPage.items,
-        8,
+        3,
         async (tp) => {
           const clauseLinks = await api.templates.clauseBlocks(tp.id).catch(() => [])
           return { template: adaptTemplate(tp, clauseLinks.map((c) => c.id)), clauseLinks }
