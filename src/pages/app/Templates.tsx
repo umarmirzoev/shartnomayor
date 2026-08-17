@@ -66,7 +66,7 @@ function Section({ widths }: { widths: string[] }) {
 
 export default function Templates() {
   const t = useT() as Dict
-  const { templates, clauses } = useAppData()
+  const { templates, clauses, ensureTemplateClauses } = useAppData()
   const [openId, setOpenId] = useState<string | null>(null)
   const [query, setQuery] = useState('')
 
@@ -104,7 +104,15 @@ export default function Templates() {
         <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-400">{t.app.templates.chooseType}</p>
         <div className="flex gap-4 overflow-x-auto pb-2">
           {filtered.slice(0, 40).map((tpl) => (
-            <FileThumb key={tpl.id} t={tpl} active={openId === tpl.id} onSelect={() => setOpenId(tpl.id)} />
+            <FileThumb
+              key={tpl.id}
+              t={tpl}
+              active={openId === tpl.id}
+              onSelect={() => {
+                setOpenId(tpl.id)
+                void ensureTemplateClauses(tpl.id)
+              }}
+            />
           ))}
         </div>
       </div>
@@ -116,7 +124,14 @@ export default function Templates() {
           const tplClauses = open ? tpl.clauseIds.map((cid) => clauses.find((c) => c.id === cid)!).filter(Boolean) : []
           return (
             <Card key={tpl.id} className="overflow-hidden">
-              <button onClick={() => setOpenId(open ? null : tpl.id)} className="flex w-full items-center justify-between gap-4 p-5 text-left">
+              <button
+                onClick={() => {
+                  const next = open ? null : tpl.id
+                  setOpenId(next)
+                  if (next) void ensureTemplateClauses(next)
+                }}
+                className="flex w-full items-center justify-between gap-4 p-5 text-left"
+              >
                 <div className="flex items-center gap-3.5">
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-ink-900 text-gold-500">
                     <FileStack size={18} />

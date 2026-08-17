@@ -76,6 +76,7 @@ interface Ctx extends State {
   incAiUsage: () => void
   resetDemoData: () => void
   reloadAll: () => Promise<void>
+  ensureTemplateClauses: (templateId: string) => Promise<void>
 }
 
 const AppDataContext = createContext<Ctx | null>(null)
@@ -184,18 +185,12 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         })
       )
 
-      const templatesWithClauses = await mapWithConcurrency(
-        templatesPage.items,
-        3,
-        async (tp) => {
-          const clauseLinks = await api.templates.clauseBlocks(tp.id).catch(() => [])
-          return { template: adaptTemplate(tp, clauseLinks.map((c) => c.id)), clauseLinks }
-        }
-      )
-      const templates = templatesWithClauses.map((x) => x.template)
-      const clauses: ClauseBlock[] = templatesWithClauses.flatMap(({ template, clauseLinks }) =>
-        clauseLinks.map((c) => adaptClauseBlock(c, template.id, lang, false))
-      )
+      // Пункты (clause-blocks) каждого шаблона грузятся лениво по требованию
+      // (см. ensureTemplateClauses ниже) — на библиотеке в сотни шаблонов
+      // ожидание отдельного запроса на каждый шаблон перед первым рендером
+      // превращало открытие страницы в многоминутное «Ничего не найдено»
+      // на медленном бесплатном хостинге (Render free tier).
+      const templates = templatesPage.items.map((tp) => adaptTemplate(tp, []))
 
       // Бэкенд намеренно ограничивает MVP-выборку только непрочитанными уведомлениями
       // (см. LegislationFeature.cs: RuleFor(...).Equal(true)) — запрос с false отклоняется.
@@ -203,7 +198,6 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       const alerts = alertsPage.items.map(adaptAlert)
 
       setRealTemplates(templates)
-      setRealClauses(clauses)
       setState((s) => ({ ...s, clients, cases, drafts, alerts, aiUsed: aiUsage?.requestsUsed ?? s.aiUsed }))
     } catch (err) {
       if (!(err instanceof ApiError && err.status === 401)) {
@@ -218,6 +212,31 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     if (isRealBackend) void loadAll()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const [loadedClauseTemplateIds, setLoadedClauseTemplateIds] = useState<Set<string>>(new Set())
+
+  // Догружает пункты одного шаблона по требованию (например, при раскрытии карточки
+  // в библиотеке) вместо того, чтобы ждать все шаблоны сразу при первой загрузке.
+  async function ensureTemplateClauses(templateId: string) {
+    if (!isRealBackend || loadedClauseTemplateIds.has(templateId)) return
+    setLoadedClauseTemplateIds((s) => new Set(s).add(templateId))
+    try {
+      const clauseLinks = await api.templates.clauseBlocks(templateId)
+      setRealClauses((prev) => [
+        ...prev.filter((c) => c.templateId !== templateId),
+        ...clauseLinks.map((c) => adaptClauseBlock(c, templateId, lang, false)),
+      ])
+      setRealTemplates((prev) =>
+        prev.map((t) => (t.id === templateId ? { ...t, clauseIds: clauseLinks.map((c) => c.id) } : t))
+      )
+    } catch {
+      setLoadedClauseTemplateIds((s) => {
+        const next = new Set(s)
+        next.delete(templateId)
+        return next
+      })
+    }
+  }
 
   async function loadDraftVersionsReal(draftId: string) {
     const [detail, versionsPage] = await Promise.all([
@@ -251,6 +270,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         loading,
         isRealBackend: true,
         reloadAll: loadAll,
+        ensureTemplateClauses,
         loadDraftVersions: loadDraftVersionsReal,
 
         addClient: async (c) => {
@@ -341,6 +361,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       loading: false,
       isRealBackend: false,
       reloadAll: async () => {},
+      ensureTemplateClauses: async () => {},
       loadDraftVersions: async () => {},
       addClient: async (c) => {
         const client: Client = { ...c, id: `cli-${Date.now()}`, createdAt: new Date().toISOString().slice(0, 10) }
