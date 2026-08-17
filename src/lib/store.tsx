@@ -113,6 +113,22 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   // На демо-масштабе (единицы клиентов) это быстро; для большого портфеля стоило бы
   // сделать выделенный агрегирующий эндпоинт на бэкенде.
   // -------------------------------------------------------------------------
+  // Ограничивает число одновременных запросов — библиотека шаблонов может содержать сотни
+  // записей, и неограниченный Promise.all забивает пул соединений бэкенда к базе (особенно
+  // заметно на маломощном бесплатном хостинге вроде Render free tier).
+  async function mapWithConcurrency<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {
+    const results: R[] = new Array(items.length)
+    let index = 0
+    async function worker() {
+      while (index < items.length) {
+        const current = index++
+        results[current] = await fn(items[current])
+      }
+    }
+    await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker))
+    return results
+  }
+
   // Бэкенд ограничивает pageSize максимум 100 записями (см. Application/Common/Validation/
   // ValidationRules.MaximumPageSize) — при библиотеке в сотни шаблонов одной страницы мало,
   // поэтому дочитываем все оставшиеся страницы перед тем, как отдавать список в UI.
@@ -162,11 +178,13 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         })
       )
 
-      const templatesWithClauses = await Promise.all(
-        templatesPage.items.map(async (tp) => {
+      const templatesWithClauses = await mapWithConcurrency(
+        templatesPage.items,
+        8,
+        async (tp) => {
           const clauseLinks = await api.templates.clauseBlocks(tp.id).catch(() => [])
           return { template: adaptTemplate(tp, clauseLinks.map((c) => c.id)), clauseLinks }
-        })
+        }
       )
       const templates = templatesWithClauses.map((x) => x.template)
       const clauses: ClauseBlock[] = templatesWithClauses.flatMap(({ template, clauseLinks }) =>
