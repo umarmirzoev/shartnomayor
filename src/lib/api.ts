@@ -462,14 +462,21 @@ export const clauseBlocksApi = {
   create: (data: CreateClauseBlockDto) => request<string>('/ClauseBlocks', { method: 'POST', body: data }),
 }
 
+// Создание, обновление и regenerate черновика синхронно ждут ответа Gemini и запись в S3-хранилище —
+// на бесплатном тарифе Render это может занимать больше минуты, поэтому им нужен отдельный
+// увеличенный таймаут вместо общего 20-секундного значения по умолчанию.
+const AI_GENERATION_TIMEOUT_MS = 90000
+
 export const draftsApi = {
-  create: (data: CreateDraftDto) => request<DraftOperationDto>('/Documents', { method: 'POST', body: data }),
+  create: (data: CreateDraftDto) =>
+    request<DraftOperationDto>('/Documents', { method: 'POST', body: data, timeoutMs: AI_GENERATION_TIMEOUT_MS }),
   update: (draftId: string, data: UpdateDraftDto) =>
-    request<DraftOperationDto>(`/Documents/${draftId}`, { method: 'PUT', body: data }),
+    request<DraftOperationDto>(`/Documents/${draftId}`, { method: 'PUT', body: data, timeoutMs: AI_GENERATION_TIMEOUT_MS }),
   regenerate: (draftId: string, instructions: string, changeSummary: string) =>
     request<DraftOperationDto>(`/Documents/${draftId}/regenerate`, {
       method: 'POST',
       body: { instructions, changeSummary },
+      timeoutMs: AI_GENERATION_TIMEOUT_MS,
     }),
   confirmResponsibility: (draftId: string) =>
     request<void>(`/Documents/${draftId}/responsibility-confirmation`, { method: 'POST' }),
