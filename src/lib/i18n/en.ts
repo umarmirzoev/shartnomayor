@@ -524,6 +524,7 @@ export const en = {
       back: 'Back',
       limitReached: 'AI request limit reached for this month',
       buildDraft: 'Assemble draft with AI',
+      genericError: "Couldn't assemble the draft. Please try again.",
       aiPort: 'IAiDraftingService port → GeminiAiDraftingService',
       stages: ['Analyzing deal description…', 'Selecting clauses from the template library…', 'Assembling contract draft…', 'Checking for contradictions…'],
       assembledFrom: 'Draft assembled from',

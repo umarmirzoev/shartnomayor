@@ -29,6 +29,7 @@ export default function DraftNew() {
   const [stageIdx, setStageIdx] = useState(0)
   const [generated, setGenerated] = useState('')
   const [realDraftId, setRealDraftId] = useState<string | null>(null)
+  const [generationError, setGenerationError] = useState('')
 
   // Список шаблонов приходит асинхронно из useAppData() в боевом режиме — как только он
   // загрузится, подставляем первый шаблон по умолчанию, если ничего ещё не выбрано.
@@ -55,6 +56,7 @@ export default function DraftNew() {
   const runGeneration = async () => {
     setStep(2)
     setGenerating(true)
+    setGenerationError('')
     setStageIdx(0)
     const interval = setInterval(() => setStageIdx((i) => Math.min(i + 1, aiStages.length - 1)), 700)
     try {
@@ -76,11 +78,15 @@ export default function DraftNew() {
         const content = await simulateAiGeneration(templateId, fieldValues, t)
         setGenerated(content)
       }
-    } finally {
       clearInterval(interval)
       incAiUsage()
       setGenerating(false)
       setStep(3)
+    } catch (err) {
+      clearInterval(interval)
+      setGenerating(false)
+      setGenerationError(err instanceof Error ? err.message : t.app.draftNew.genericError)
+      setStep(1)
     }
   }
 
@@ -193,6 +199,11 @@ export default function DraftNew() {
               ))}
             </div>
           </div>
+          {generationError && (
+            <p className="mt-4 rounded-lg bg-red-50 px-3.5 py-2.5 text-sm font-medium text-red-600 dark:bg-red-500/10 dark:text-red-400">
+              {generationError}
+            </p>
+          )}
           <div className="mt-6 flex items-center justify-between">
             <Button variant="ghost" onClick={() => setStep(0)} icon={<ArrowLeft size={16} />}>{t.app.draftNew.back}</Button>
             {limitReached ? (
